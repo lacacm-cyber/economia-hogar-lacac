@@ -109,8 +109,12 @@ main{max-width:720px;margin:0 auto;padding:16px 16px calc(96px + env(safe-area-i
 .graf-t{display:flex;justify-content:space-between;gap:8px;font-size:13px;font-weight:600;margin-bottom:4px}
 .graf-t small{color:var(--mute);font-weight:500}
 .graf svg{width:100%;height:auto;display:block}
-.g-v{font:700 11px Archivo,Inter,sans-serif;fill:var(--ink)}
+.g-v{font-family:Archivo,Inter,sans-serif}
 .g-m{font:500 9px Inter,sans-serif;fill:var(--mute)}.g-m.act{fill:var(--ink);font-weight:700}
+.g-v{font-size:9px;font-weight:600;fill:var(--mute)}.g-v.act{font-size:11px;font-weight:700;fill:var(--ink)}
+.graf-r{list-style:none;margin:8px 0 0;padding:0;display:grid;gap:4px;font-size:14px}
+.graf-r li::before{content:"• ";color:var(--mute)}
+.sube{color:var(--rojo);font-weight:600}.baja{color:var(--verde);font-weight:600}
 .chips button{flex:none;min-height:40px;padding:0 14px;border-radius:99px;border:1px solid var(--line);background:var(--card);font-size:14px;font-weight:600}
 .chips button[aria-pressed=true]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
 .comps{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin-bottom:12px}
@@ -514,21 +518,47 @@ function grafico(todas, sv) {
   const hayC = todas.some(conC);
   const uni = hayC ? ((todas.find(r => conC(r) && r.unidad) || {}).unidad || SERV[sv] || '') : '$';
   const val = meses.map(mm => todas.filter(r => r.mes === mm && (hayC ? conC(r) : true)).reduce((a, r) => a + Number(hayC ? r.consumo : r.valor), 0));
-  if (val.filter(v => v > 0).length < 1) return '';
-  const max = Math.max(...val), W = 320, H = 120, bw = W / 12, top = 18, base = H - 18;
-  const fmt = v => hayC ? String(Math.round(v * 10) / 10).replace('.', ',') : money(v);
+  if (!val.some(v => v > 0)) return '';
+  const num = v => String(Math.round(v * 10) / 10).replace('.', ',');
+  const fmt = v => hayC ? num(v) : money(v);
+  const corto = v => hayC ? num(v) : (v >= 100 ? String(Math.round(v)) : v.toFixed(2).replace('.', ','));
+  const max = Math.max(...val), W = 336, H = 136, bw = W / 12, top = 22, base = H - 18;
+  const conDatos = val.filter(v => v > 0), prom = conDatos.reduce((a, v) => a + v, 0) / conDatos.length;
+  const yProm = base - (prom / max) * (base - top);
   const barras = val.map((v, i) => {
     const h = max ? Math.max(v ? 3 : 0, (v / max) * (base - top)) : 0;
-    const x = i * bw + bw * 0.18, w = bw * 0.64, act = meses[i] === mes;
-    return `<rect x="${x.toFixed(1)}" y="${(base - h).toFixed(1)}" width="${w.toFixed(1)}" height="${h.toFixed(1)}" rx="3" fill="${act ? 'var(--rojo)' : 'var(--c)'}" opacity="${act ? 1 : .75}"/>`
-      + (act && v ? `<text x="${(x + w / 2).toFixed(1)}" y="${(base - h - 5).toFixed(1)}" text-anchor="middle" class="g-v">${esc(fmt(v))}</text>` : '')
-      + `<text x="${(x + w / 2).toFixed(1)}" y="${H - 4}" text-anchor="middle" class="g-m${act ? ' act' : ''}">${MESES[Number(meses[i].slice(5)) - 1].slice(0, 3)}</text>`;
+    const x = i * bw + bw * 0.16, w = bw * 0.68, act = meses[i] === mes, cx = (x + w / 2).toFixed(1);
+    return `<rect x="${x.toFixed(1)}" y="${(base - h).toFixed(1)}" width="${w.toFixed(1)}" height="${h.toFixed(1)}" rx="3" fill="${act ? 'var(--rojo)' : 'var(--c)'}" opacity="${act ? 1 : .75}"><title>${esc(mesLargo(meses[i]))}: ${esc(fmt(v))}${hayC ? ' ' + esc(uni) : ''}</title></rect>`
+      + (v ? `<text x="${cx}" y="${(base - h - 4).toFixed(1)}" text-anchor="middle" class="g-v${act ? ' act' : ''}">${esc(corto(v))}</text>` : '')
+      + `<text x="${cx}" y="${H - 4}" text-anchor="middle" class="g-m${act ? ' act' : ''}">${MESES[Number(meses[i].slice(5)) - 1].slice(0, 3)}</text>`;
   }).join('');
-  const conDatos = val.filter(v => v > 0), prom = conDatos.reduce((a, v) => a + v, 0) / conDatos.length;
+  // Resumen del mes elegido
+  const vAct = val[11], vAnt = val[10], ul = hayC ? ' ' + uni : '';
+  const lineas = [];
+  if (vAct) {
+    if (vAnt) {
+      const d = vAct - vAnt;
+      lineas.push(d === 0 ? `Igual que ${MESES[Number(meses[10].slice(5)) - 1]}` :
+        `<span class="${d > 0 ? 'sube' : 'baja'}">${d > 0 ? '▲' : '▼'} ${esc(fmt(Math.abs(d)))}${esc(ul)} ${d > 0 ? 'más' : 'menos'}</span> que ${MESES[Number(meses[10].slice(5)) - 1]}`);
+    }
+    if (conDatos.length > 1 && prom) {
+      const pc = Math.round((vAct - prom) / prom * 100);
+      lineas.push(pc === 0 ? 'En su promedio' : `<span class="${pc > 0 ? 'sube' : 'baja'}">${Math.abs(pc)} % ${pc > 0 ? 'sobre' : 'bajo'}</span> su promedio`);
+    }
+  }
+  const maxI = val.indexOf(max);
+  lineas.push(`Mes más alto: ${esc(mesLargo(meses[maxI]))} (${esc(fmt(max))}${esc(ul)})`);
+  if (hayC) {
+    const rs = todas.filter(r => conC(r) && Number(r.consumo) > 0 && r.valor);
+    const tv = rs.reduce((a, r) => a + Number(r.valor), 0), tc = rs.reduce((a, r) => a + Number(r.consumo), 0);
+    if (tc) lineas.push(`Le cuesta en promedio ${esc(money(tv / tc))} cada ${esc(uni)}`);
+  }
   return `<div class="graf">
-    <div class="graf-t">${hayC ? 'Consumo mes a mes (' + esc(uni) + ')' : 'Valor mes a mes'}<small>Promedio: ${esc(fmt(prom))}${hayC ? ' ' + esc(uni) : ''}</small></div>
+    <div class="graf-t">${hayC ? 'Consumo mes a mes (' + esc(uni) + ')' : 'Valor pagado mes a mes ($)'}<small>Promedio: ${esc(fmt(prom))}${esc(ul)}</small></div>
     <svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Gráfico de ${esc(hayC ? 'consumo' : 'valor')} de ${esc(sv)} en los últimos 12 meses">
-      <line x1="0" x2="${W}" y1="${base}" y2="${base}" stroke="var(--line)"/>${barras}</svg>
+      <line x1="0" x2="${W}" y1="${base}" y2="${base}" stroke="var(--line)"/>
+      <line x1="0" x2="${W}" y1="${yProm.toFixed(1)}" y2="${yProm.toFixed(1)}" stroke="var(--mute)" stroke-dasharray="4 4" opacity=".6"/>${barras}</svg>
+    <ul class="graf-r">${lineas.map(l => `<li>${l}</li>`).join('')}</ul>
   </div>`;
 }
 
