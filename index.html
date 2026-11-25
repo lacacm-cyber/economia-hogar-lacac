@@ -125,7 +125,7 @@ main{max-width:720px;margin:0 auto;padding:16px 16px calc(96px + env(safe-area-i
 .chips button{flex:none;min-height:40px;padding:0 14px;border-radius:99px;border:1px solid var(--line);background:var(--card);font-size:14px;font-weight:600}
 .chips button[aria-pressed=true]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
 .comps{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin-bottom:12px}
-.comp{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;display:grid;gap:2px}
+.comp{text-align:left;color:inherit;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;display:grid;gap:2px}
 .comp span:first-of-type{font-family:Archivo,Inter,sans-serif;font-size:19px;font-weight:700}
 .comp small{color:var(--mute)}
 .lista{display:grid;gap:8px}
@@ -518,10 +518,11 @@ function vInicio() {
 
 /* Sección */
 /* Gráfico de consumo: 12 meses hasta el mes elegido */
+const consumoOk = r => r.consumo !== '' && r.consumo != null && !isNaN(Number(r.consumo)) && Number(r.consumo) >= 0 && Number(r.consumo) !== Number((r.mes || '').slice(0, 4));
 function grafico(todas, sv) {
   const meses = []; let m = mes;
   for (let i = 0; i < 12; i++) { meses.unshift(m); m = mesAnterior(m); }
-  const conC = r => r.consumo !== '' && r.consumo != null && !isNaN(Number(r.consumo));
+  const conC = consumoOk;
   const hayC = todas.some(conC);
   const uni = hayC ? ((todas.find(r => conC(r) && r.unidad) || {}).unidad || SERV[sv] || '') : '$';
   const val = meses.map(mm => todas.filter(r => r.mes === mm && (hayC ? conC(r) : true)).reduce((a, r) => a + Number(hayC ? r.consumo : r.valor), 0));
@@ -586,7 +587,8 @@ function vSeccion() {
   const total = suma(lista), totalPrev = suma(delMes(prev, s.n));
   let extra = '', vacio = '';
   if (s.n === 'Servicios básicos') {
-    const usados = Object.keys(SERV).filter(x => lista.some(r => r.servicio === x));
+    const nombres = [...new Set(datos.filter(r => r.seccion === s.n && r.servicio).map(r => r.servicio))];
+    const usados = [...Object.keys(SERV).filter(x => nombres.includes(x)), ...nombres.filter(x => !SERV[x]).sort()];
     if (usados.length > 1) {
       if (!['Todos', ...usados].includes(subFiltro)) subFiltro = 'Todos';
       extra += `<div class="chips">${['Todos', ...usados].map(x => `<button data-sub="${esc(x)}" aria-pressed="${x === subFiltro}">${esc(x)}</button>`).join('')}</div>`;
@@ -599,7 +601,7 @@ function vSeccion() {
       const delAnio = todas.filter(r => (r.mes || '').slice(0, 4) === anio);
       const pag = delAnio.filter(r => r.pagado).sort((a, b) => b.pagado.localeCompare(a.pagado));
       const por = todas.filter(r => !r.pagado).sort((a, b) => (a.vence || '9').localeCompare(b.vence || '9'));
-      const conC = todas.filter(r => r.consumo !== '' && r.consumo != null && !isNaN(Number(r.consumo))).sort((a, b) => (b.mes || '').localeCompare(a.mes || '') || (b.emision || '').localeCompare(a.emision || ''));
+      const conC = todas.filter(consumoOk).sort((a, b) => (b.mes || '').localeCompare(a.mes || '') || (b.emision || '').localeCompare(a.emision || ''));
       const ult = conC[0];
       if (subEstado !== 'pag' && subEstado !== 'por') subEstado = por.length ? 'por' : 'pag';
       const chips = (extra.match(/<div class="chips">[\s\S]*$/) || [''])[0];
@@ -621,7 +623,7 @@ function vSeccion() {
       const ant = delMes(prev, s.n).filter(r => r.servicio === x);
       const c = delMes(mes, s.n).filter(r => r.servicio === x && r.consumo !== '' && r.consumo != null).reduce((a, r) => a + Number(r.consumo), 0);
       const cAnt = ant.filter(r => r.consumo !== '' && r.consumo != null).reduce((a, r) => a + Number(r.consumo), 0);
-      return `<div class="comp"><b>${esc(x)}</b><span>${money(v)}</span>${ant.length ? delta(v, suma(ant), money, prev) : ''}${c ? `<small>${c} ${SERV[x]}${cAnt ? ' · ' + delta(c, cAnt, n => n + ' ' + SERV[x], prev) : ''}</small>` : ''}</div>`;
+      return `<button class="comp" data-sub="${esc(x)}"><b>${esc(x)}</b><span>${money(v)}</span>${ant.length ? delta(v, suma(ant), money, prev) : ''}${c ? `<small>${c} ${SERV[x]}${cAnt ? ' · ' + delta(c, cAnt, n => n + ' ' + SERV[x], prev) : ''}</small>` : ''}</button>`;
     }).join('');
     if (comp && !vacio) extra = `<div class="comps">${comp}</div>` + extra;
   }
