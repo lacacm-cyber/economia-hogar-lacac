@@ -127,8 +127,8 @@ main{max-width:720px;margin:0 auto;padding:16px 16px calc(96px + env(safe-area-i
 .chips button[aria-pressed=true]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
 .comps{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin-bottom:12px}
 .comp{text-align:left;color:inherit;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;display:grid;gap:2px}
-.comp span:first-of-type{font-family:Archivo,Inter,sans-serif;font-size:19px;font-weight:700}
-.comp small{color:var(--mute)}
+.comp>span:first-of-type{font-family:Archivo,Inter,sans-serif;font-size:19px;font-weight:700}
+.comp small{color:var(--mute);font-size:13px}.comp .delta{font-size:13px;display:block}.comp small .delta{display:inline}
 .lista{display:grid;gap:8px}
 .fac{width:100%;display:grid;grid-template-columns:40px minmax(0,1fr) auto;gap:12px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px 14px;min-height:64px}
 .fac-ico{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;color:var(--c);background:color-mix(in srgb,var(--c) 14%,transparent)}
@@ -447,7 +447,7 @@ const dias = d => Math.round((new Date(d + 'T00:00') - new Date(hoy() + 'T00:00'
 const mesAnterior = m => { const [y, mm] = m.split('-').map(Number); const d = new Date(y, mm - 2, 1); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0'); };
 const mesSiguiente = m => { const [y, mm] = m.split('-').map(Number); const d = new Date(y, mm, 1); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0'); };
 
-const VERSION_APP = '25-nov-2026 · 10';
+const VERSION_APP = '25-nov-2026 · 11';
 let datos = [], vista = 'inicio', mes = hoy().slice(0, 7), secAbierta = '', subFiltro = 'Todos', subEstado = '', idHoja = '';
 
 function say(t, tipo) { const m = $('msg'); m.textContent = t; m.className = 'msg' + (tipo ? ' ' + tipo : ''); m.classList.toggle('hidden', !t); if (t) setTimeout(() => m.classList.add('hidden'), 6000); }
@@ -590,7 +590,7 @@ function vSeccion() {
   let extra = '', vacio = '';
   if (s.n === 'Servicios básicos') {
     const nombres = [...new Set(datos.filter(r => r.seccion === s.n && r.servicio).map(r => r.servicio))];
-    const usados = [...Object.keys(SERV).filter(x => nombres.includes(x)), ...nombres.filter(x => !SERV[x]).sort()];
+    const usados = [...Object.keys(SERV).filter(x => nombres.includes(x)), ...nombres.filter(x => !(x in SERV)).sort()];
     if (usados.length > 1) {
       if (!['Todos', ...usados].includes(subFiltro)) subFiltro = 'Todos';
       extra += `<div class="chips">${['Todos', ...usados].map(x => `<button data-sub="${esc(x)}" aria-pressed="${x === subFiltro}">${esc(x)}</button>`).join('')}</div>`;
