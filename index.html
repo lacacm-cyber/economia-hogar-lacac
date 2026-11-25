@@ -105,6 +105,12 @@ main{max-width:720px;margin:0 auto;padding:16px 16px calc(96px + env(safe-area-i
 .mini small{color:var(--mute);font-size:12px}
 .mini.ok span{color:var(--verde)}.mini.pend span{color:var(--rojo)}
 .mini[aria-pressed=true]{border-color:var(--ink)}
+.graf{margin-top:6px;border-top:1px solid var(--line);padding-top:10px}
+.graf-t{display:flex;justify-content:space-between;gap:8px;font-size:13px;font-weight:600;margin-bottom:4px}
+.graf-t small{color:var(--mute);font-weight:500}
+.graf svg{width:100%;height:auto;display:block}
+.g-v{font:700 11px Archivo,Inter,sans-serif;fill:var(--ink)}
+.g-m{font:500 9px Inter,sans-serif;fill:var(--mute)}.g-m.act{fill:var(--ink);font-weight:700}
 .chips button{flex:none;min-height:40px;padding:0 14px;border-radius:99px;border:1px solid var(--line);background:var(--card);font-size:14px;font-weight:600}
 .chips button[aria-pressed=true]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
 .comps{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin-bottom:12px}
@@ -500,6 +506,32 @@ function vInicio() {
 }
 
 /* Sección */
+/* Gráfico de consumo: 12 meses hasta el mes elegido */
+function grafico(todas, sv) {
+  const meses = []; let m = mes;
+  for (let i = 0; i < 12; i++) { meses.unshift(m); m = mesAnterior(m); }
+  const conC = r => r.consumo !== '' && r.consumo != null && !isNaN(Number(r.consumo));
+  const hayC = todas.some(conC);
+  const uni = hayC ? ((todas.find(r => conC(r) && r.unidad) || {}).unidad || SERV[sv] || '') : '$';
+  const val = meses.map(mm => todas.filter(r => r.mes === mm && (hayC ? conC(r) : true)).reduce((a, r) => a + Number(hayC ? r.consumo : r.valor), 0));
+  if (val.filter(v => v > 0).length < 1) return '';
+  const max = Math.max(...val), W = 320, H = 120, bw = W / 12, top = 18, base = H - 18;
+  const fmt = v => hayC ? String(Math.round(v * 10) / 10).replace('.', ',') : money(v);
+  const barras = val.map((v, i) => {
+    const h = max ? Math.max(v ? 3 : 0, (v / max) * (base - top)) : 0;
+    const x = i * bw + bw * 0.18, w = bw * 0.64, act = meses[i] === mes;
+    return `<rect x="${x.toFixed(1)}" y="${(base - h).toFixed(1)}" width="${w.toFixed(1)}" height="${h.toFixed(1)}" rx="3" fill="${act ? 'var(--rojo)' : 'var(--c)'}" opacity="${act ? 1 : .75}"/>`
+      + (act && v ? `<text x="${(x + w / 2).toFixed(1)}" y="${(base - h - 5).toFixed(1)}" text-anchor="middle" class="g-v">${esc(fmt(v))}</text>` : '')
+      + `<text x="${(x + w / 2).toFixed(1)}" y="${H - 4}" text-anchor="middle" class="g-m${act ? ' act' : ''}">${MESES[Number(meses[i].slice(5)) - 1].slice(0, 3)}</text>`;
+  }).join('');
+  const conDatos = val.filter(v => v > 0), prom = conDatos.reduce((a, v) => a + v, 0) / conDatos.length;
+  return `<div class="graf">
+    <div class="graf-t">${hayC ? 'Consumo mes a mes (' + esc(uni) + ')' : 'Valor mes a mes'}<small>Promedio: ${esc(fmt(prom))}${hayC ? ' ' + esc(uni) : ''}</small></div>
+    <svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Gráfico de ${esc(hayC ? 'consumo' : 'valor')} de ${esc(sv)} en los últimos 12 meses">
+      <line x1="0" x2="${W}" y1="${base}" y2="${base}" stroke="var(--line)"/>${barras}</svg>
+  </div>`;
+}
+
 function vSeccion() {
   const s = sec(secAbierta);
   let lista = delMes(mes, s.n);
@@ -528,6 +560,7 @@ function vSeccion() {
         <b>${esc(sv)}</b>
         <div class="franja-fila"><span>Total del año ${esc(anio)}</span><strong>${money(suma(delAnio))}</strong></div>
         <div class="franja-fila"><span>Último consumo${ult ? ' (' + esc(mesLargo(ult.mes)) + ')' : ''}</span><strong>${ult ? esc(Number(ult.consumo) + ' ' + (ult.unidad || SERV[sv] || '')) : '—'}</strong></div>
+        ${grafico(todas, sv)}
       </div>
       <div class="dos">
         <button class="mini ok" data-sest="pag" aria-pressed="${subEstado === 'pag'}"><span>✓ Pagadas</span><b>${pag.length} · ${money(suma(pag))}</b><small>en ${esc(anio)}</small></button>
