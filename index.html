@@ -91,6 +91,7 @@ main{max-width:720px;margin:0 auto;padding:16px 16px calc(96px + env(safe-area-i
 .cab-sec h2{font-size:22px;font-weight:800}
 .cab-sec .delta{display:block}
 .cifra-s{font-size:26px;font-weight:800}
+.regresar{display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:0 18px;margin:0 0 12px;border-radius:999px;background:var(--ink);color:var(--bg);font-weight:700;font-size:16px}
 .volver{width:44px;height:44px;font-size:30px;line-height:1;display:grid;place-items:center;border-radius:50%;border:1px solid var(--line);flex:none}
 .chips{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px;margin-bottom:10px}
 .franja{background:var(--card);border:1px solid var(--line);border-left:6px solid var(--c);border-radius:16px;padding:14px 16px;margin-bottom:10px;display:grid;gap:6px}
@@ -446,6 +447,7 @@ const dias = d => Math.round((new Date(d + 'T00:00') - new Date(hoy() + 'T00:00'
 const mesAnterior = m => { const [y, mm] = m.split('-').map(Number); const d = new Date(y, mm - 2, 1); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0'); };
 const mesSiguiente = m => { const [y, mm] = m.split('-').map(Number); const d = new Date(y, mm, 1); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0'); };
 
+const VERSION_APP = '25-nov-2026 · 9';
 let datos = [], vista = 'inicio', mes = hoy().slice(0, 7), secAbierta = '', subFiltro = 'Todos', subEstado = '', idHoja = '';
 
 function say(t, tipo) { const m = $('msg'); m.textContent = t; m.className = 'msg' + (tipo ? ' ' + tipo : ''); m.classList.toggle('hidden', !t); if (t) setTimeout(() => m.classList.add('hidden'), 6000); }
@@ -628,8 +630,8 @@ function vSeccion() {
     if (comp && !vacio) extra = `<div class="comps">${comp}</div>` + extra;
   }
   return `
+  <button class="regresar" data-atras="1">‹ Regresar${subFiltro !== 'Todos' ? ' a ' + esc(s.n) : ' al inicio'}</button>
   <div class="cab-sec" style="--c:var(${s.c})">
-    <button class="volver" data-ir="inicio" aria-label="Volver">‹</button>
     <span class="tile-ico">${icono(s.n)}</span>
     <div><h2>${esc(s.n)}</h2><span class="cifra-s">${money(total)}</span> ${delta(total, delMes(prev, s.n).length ? totalPrev : null, money, prev)}</div>
   </div>
@@ -676,6 +678,7 @@ function vMas() {
     <a class="btn" href="https://srienlinea.sri.gob.ec/" target="_blank" rel="noopener"><b>SRI en línea</b><small>Abre la página del SRI (declaraciones y gastos personales)</small></a>
     <button data-accion="bloquear"><b>Bloquear ahora</b><small>Pedirá la huella para volver a entrar</small></button>
     <button data-accion="seguridad"><b>Cambiar huella o PIN</b><small id="m-seg"></small></button>
+    <button data-accion="actualizar"><b>Actualizar la app</b><small>Versión ${VERSION_APP}. Toque aquí si no ve los últimos cambios</small></button>
     <button data-accion="desconectar"><b>Desconectar este celular</b><small>Borra la conexión y los datos guardados aquí</small></button>
   </div>
   <p class="nota">Sus facturas viven en su propia hoja de Google. Esta app solo las muestra en su celular.</p>`;
@@ -692,15 +695,25 @@ function render() {
 }
 
 /* Navegación */
-function ir(v) { vista = v; render(); }
+function ir(v) { vista = v; render(); window.scrollTo(0, 0); }
+/* Regresar: botón de la app y botón «atrás» del celular */
+let pasos = 0;
+function avanzar() { try { history.pushState({ eh: ++pasos }, ''); } catch (e) {} }
+function atrasUnPaso() {
+  if (vista === 'seccion' && subFiltro !== 'Todos') { subFiltro = 'Todos'; subEstado = ''; render(); window.scrollTo(0, 0); }
+  else if (vista !== 'inicio') ir('inicio');
+}
+function regresar() { if (pasos > 0) history.back(); else atrasUnPaso(); }
+window.addEventListener('popstate', () => { if (pasos > 0) pasos--; if ($('hoja').open) { $('hoja').close(); return; } atrasUnPaso(); });
 document.querySelector('.tabbar').addEventListener('click', e => { const b = e.target.closest('button'); if (b) ir(b.dataset.ir); });
 $('mes-ant').addEventListener('click', () => { mes = mesAnterior(mes); render(); });
 $('mes-sig').addEventListener('click', () => { mes = mesSiguiente(mes); render(); });
 $('view').addEventListener('click', e => {
   const b = e.target.closest('button'); if (!b) return;
-  if (b.dataset.ir) ir(b.dataset.ir);
-  else if (b.dataset.sec) { secAbierta = b.dataset.sec; subFiltro = 'Todos'; subEstado = ''; ir('seccion'); }
-  else if (b.dataset.sub) { subFiltro = b.dataset.sub; subEstado = ''; render(); }
+  if (b.dataset.atras) regresar();
+  else if (b.dataset.ir) ir(b.dataset.ir);
+  else if (b.dataset.sec) { secAbierta = b.dataset.sec; subFiltro = 'Todos'; subEstado = ''; avanzar(); ir('seccion'); }
+  else if (b.dataset.sub) { const antes = subFiltro; subFiltro = b.dataset.sub; subEstado = ''; if (antes === 'Todos' && subFiltro !== 'Todos') avanzar(); render(); }
   else if (b.dataset.sest) { subEstado = b.dataset.sest; render(); }
   else if (b.dataset.ptab) { pagosTab = b.dataset.ptab; render(); }
   else if (b.dataset.pserv) { pagosServ = b.dataset.pserv; render(); }
@@ -782,6 +795,13 @@ $('form').addEventListener('submit', e => {
 function accion(a, b) {
   if (a === 'manual') { $('form').reset(); $('f-fecha').value = hoy(); $('f-serv-box').classList.add('hidden'); $('formu').showModal(); }
   if (a === 'bloquear') mostrarBloqueo();
+  if (a === 'actualizar') {
+    say('Actualizando…');
+    Promise.all([
+      'caches' in window ? caches.keys().then(ks => Promise.all(ks.map(k => caches.delete(k)))) : null,
+      navigator.serviceWorker ? navigator.serviceWorker.getRegistrations().then(rs => Promise.all(rs.map(r => r.unregister()))) : null
+    ]).finally(() => location.replace(location.pathname + '?v=' + Date.now()));
+  }
   if (a === 'seguridad') { ver('p-seguridad'); prepararSeguridad(); }
   if (a === 'desconectar') {
     if (!b.dataset.sure) { b.dataset.sure = '1'; b.querySelector('b').textContent = 'Toque otra vez para desconectar'; return; }
