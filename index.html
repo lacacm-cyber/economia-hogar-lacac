@@ -114,6 +114,13 @@ main{max-width:720px;margin:0 auto;padding:16px 16px calc(96px + env(safe-area-i
 .g-v{font-size:9px;font-weight:600;fill:var(--mute)}.g-v.act{font-size:11px;font-weight:700;fill:var(--ink)}
 .graf-r{list-style:none;margin:8px 0 0;padding:0;display:grid;gap:4px;font-size:14px}
 .graf-r li::before{content:"• ";color:var(--mute)}
+.g-v{font-size:8.5px}.g-v.act{font-size:9.5px}
+.g-in{font:700 9px Archivo,Inter,sans-serif;fill:#fff}
+.g-c{font:700 9px Archivo,Inter,sans-serif;fill:var(--ink)}
+.graf-ley{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:12px;color:var(--mute);margin-bottom:2px}
+.graf-ley span{display:inline-flex;align-items:center;gap:5px}
+.ley-d{font-style:normal;font-weight:700;color:var(--ink)}
+.ley-c{display:inline-block;width:10px;height:10px;border-radius:2px}
 .sube{color:var(--rojo);font-weight:600}.baja{color:var(--verde);font-weight:600}
 .chips button{flex:none;min-height:40px;padding:0 14px;border-radius:99px;border:1px solid var(--line);background:var(--card);font-size:14px;font-weight:600}
 .chips button[aria-pressed=true]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
@@ -522,15 +529,24 @@ function grafico(todas, sv) {
   const num = v => String(Math.round(v * 10) / 10).replace('.', ',');
   const fmt = v => hayC ? num(v) : money(v);
   const corto = v => hayC ? num(v) : (v >= 100 ? String(Math.round(v)) : v.toFixed(2).replace('.', ','));
-  const max = Math.max(...val), W = 336, H = 136, bw = W / 12, top = 22, base = H - 18;
+  const max = Math.max(...val), W = 336, H = 150, bw = W / 12, top = 34, base = H - 18;
   const conDatos = val.filter(v => v > 0), prom = conDatos.reduce((a, v) => a + v, 0) / conDatos.length;
   const yProm = base - (prom / max) * (base - top);
+  const din = meses.map(mm => todas.filter(r => r.mes === mm).reduce((a, r) => a + Number(r.valor || 0), 0));
+  const dosD = v => v.toFixed(2).replace('.', ',');
   const barras = val.map((v, i) => {
     const h = max ? Math.max(v ? 3 : 0, (v / max) * (base - top)) : 0;
-    const x = i * bw + bw * 0.16, w = bw * 0.68, act = meses[i] === mes, cx = (x + w / 2).toFixed(1);
-    return `<rect x="${x.toFixed(1)}" y="${(base - h).toFixed(1)}" width="${w.toFixed(1)}" height="${h.toFixed(1)}" rx="3" fill="${act ? 'var(--rojo)' : 'var(--c)'}" opacity="${act ? 1 : .75}"><title>${esc(mesLargo(meses[i]))}: ${esc(fmt(v))}${hayC ? ' ' + esc(uni) : ''}</title></rect>`
-      + (v ? `<text x="${cx}" y="${(base - h - 4).toFixed(1)}" text-anchor="middle" class="g-v${act ? ' act' : ''}">${esc(corto(v))}</text>` : '')
-      + `<text x="${cx}" y="${H - 4}" text-anchor="middle" class="g-m${act ? ' act' : ''}">${MESES[Number(meses[i].slice(5)) - 1].slice(0, 3)}</text>`;
+    const x = i * bw + bw * 0.12, w = bw * 0.76, act = meses[i] === mes, cx = x + w / 2, yb = base - h;
+    let t = `<rect x="${x.toFixed(1)}" y="${yb.toFixed(1)}" width="${w.toFixed(1)}" height="${h.toFixed(1)}" rx="3" fill="${act ? 'var(--rojo)' : 'var(--c)'}" opacity="${act ? 1 : .8}"><title>${esc(mesLargo(meses[i]))}: ${hayC ? esc(num(v) + ' ' + uni) + ' · ' : ''}${esc(money(din[i]))}</title></rect>`;
+    let yTop = yb;
+    if (hayC && v) {
+      const txt = num(v), cabe = txt.length * 5.6 <= w + 1 && h >= 15;
+      if (cabe) t += `<text x="${cx.toFixed(1)}" y="${(yb + 11).toFixed(1)}" text-anchor="middle" class="g-in">${esc(txt)}</text>`;
+      else { t += `<text x="${cx.toFixed(1)}" y="${(yb - 3).toFixed(1)}" text-anchor="middle" class="g-c">${esc(txt)}</text>`; yTop = yb - 11; }
+    }
+    if (din[i]) t += `<text x="${cx.toFixed(1)}" y="${(yTop - 4).toFixed(1)}" text-anchor="middle" class="g-v${act ? ' act' : ''}">${esc(dosD(din[i]))}</text>`;
+    t += `<text x="${cx.toFixed(1)}" y="${H - 4}" text-anchor="middle" class="g-m${act ? ' act' : ''}">${MESES[Number(meses[i].slice(5)) - 1].slice(0, 3)}</text>`;
+    return t;
   }).join('');
   // Resumen del mes elegido
   const vAct = val[11], vAnt = val[10], ul = hayC ? ' ' + uni : '';
@@ -554,7 +570,8 @@ function grafico(todas, sv) {
     if (tc) lineas.push(`Le cuesta en promedio ${esc(money(tv / tc))} cada ${esc(uni)}`);
   }
   return `<div class="graf">
-    <div class="graf-t">${hayC ? 'Consumo mes a mes (' + esc(uni) + ')' : 'Valor pagado mes a mes ($)'}<small>Promedio: ${esc(fmt(prom))}${esc(ul)}</small></div>
+    <div class="graf-t">${hayC ? 'Consumo y costo mes a mes' : 'Valor pagado mes a mes'}<small>Promedio: ${esc(fmt(prom))}${esc(ul)}</small></div>
+    <div class="graf-ley"><span><i class="ley-d">$</i> Arriba: dólares pagados</span>${hayC ? `<span><i class="ley-c" style="background:var(--c)"></i> Dentro de la barra: ${esc(uni)} consumidos</span>` : ''}</div>
     <svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Gráfico de ${esc(hayC ? 'consumo' : 'valor')} de ${esc(sv)} en los últimos 12 meses">
       <line x1="0" x2="${W}" y1="${base}" y2="${base}" stroke="var(--line)"/>
       <line x1="0" x2="${W}" y1="${yProm.toFixed(1)}" y2="${yProm.toFixed(1)}" stroke="var(--mute)" stroke-dasharray="4 4" opacity=".6"/>${barras}</svg>

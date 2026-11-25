@@ -1,6 +1,6 @@
 // Economía del hogar LACAC: guarda la app para abrir rápido y sin conexión.
 // Nunca guarda datos de facturas: esos viven en la cuenta de Google del usuario.
-const VERSION = 'eh-lacac-v6';
+const VERSION = 'eh-lacac-v7';
 const ARCHIVOS = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './apple-touch-icon.png'];
 
 self.addEventListener('install', e => {
