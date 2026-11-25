@@ -9,96 +9,142 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-/* Marca LACAC: negro y rojo sobre crema, cinco barras que suben. */
-:root{--bg:#f4ecdc;--card:#fbf6ec;--ink:#141414;--mute:#6b6358;--line:#d9cdb8;--deep:#141414;--acc:#c8102e;--on-acc:#f4ecdc;--bad:#c8102e;--ok:#25693f;
---agua:#2a6f9e;--luz:#9a6b00;--tel:#6b4f9e;--net:#1f7a6d;--basura:#25693f;--otro:#6b6358}
-@media(prefers-color-scheme:dark){:root{--bg:#141414;--card:#1f1d1a;--ink:#f4ecdc;--mute:#b5aa98;--line:#3a352f;--deep:#000;--acc:#ff5a5f;--on-acc:#141414;--bad:#ff5a5f;--ok:#63c08a;
---agua:#6fb3e0;--luz:#e6b84a;--tel:#b39ddb;--net:#5cc2b2;--basura:#63c08a;--otro:#b5aa98}}
-*{box-sizing:border-box;min-width:0}
-html,body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 Inter,system-ui,sans-serif}
-body{padding-bottom:env(safe-area-inset-bottom)}
-h1,h2,.big{font-family:Archivo,Inter,sans-serif;line-height:1.05;margin:0}
-button{font:600 15px Inter,sans-serif;min-height:44px;padding:0 16px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer}
-button.acc{background:var(--acc);color:var(--on-acc);border-color:var(--acc)}
-button.pri{background:var(--ink);color:var(--bg);border-color:var(--ink)}
-button.link{background:none;border:0;color:var(--mute);text-decoration:underline;min-height:40px}
-button:disabled{opacity:.55}
-button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
-input,select{font:16px Inter,sans-serif;min-height:46px;padding:8px 12px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink);width:100%}
+/* Marca LACAC: negro y rojo sobre crema, cinco barras que suben.
+   IDEA: una libreta de cuentas del hogar — el mes arriba, la cifra grande, una tarjeta por cada parte de la casa.
+   El rojo solo para alertas (vencidas, recargos) y la quinta barra. */
+:root{--bg:#f4ecdc;--card:#fbf6ec;--ink:#141414;--mute:#6b6358;--line:#e3d8c4;--negro:#141414;--crema:#f4ecdc;--rojo:#c8102e;--verde:#25693f;
+--s1:#2a6f9e;--s2:#9a6b00;--s3:#1f7a6d;--s4:#6b4f9e;--s5:#8a5a2b;--s6:#a23d6d;--s7:#4a6b2a;--s8:#6b6358}
+@media(prefers-color-scheme:dark){:root{--bg:#141414;--card:#1f1d1a;--ink:#f4ecdc;--mute:#b5aa98;--line:#34302a;--rojo:#ff5a5f;--verde:#63c08a;
+--s1:#6fb3e0;--s2:#e6b84a;--s3:#5cc2b2;--s4:#b39ddb;--s5:#d9a066;--s6:#e48ab4;--s7:#9fcb6b;--s8:#b5aa98}}
+*{box-sizing:border-box;min-width:0;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 Inter,system-ui,sans-serif}
+h1,h2,.cifra,.cifra-s{font-family:Archivo,Inter,sans-serif;margin:0;line-height:1.05}
+button,.btn{font:inherit;color:inherit;background:none;border:0;cursor:pointer;text-align:left;text-decoration:none;display:block}
+button:disabled{opacity:.4}
+:focus-visible{outline:3px solid var(--rojo);outline-offset:2px;border-radius:8px}
+input,select{font:16px Inter,sans-serif;min-height:48px;padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:var(--bg);color:var(--ink);width:100%}
 .hidden{display:none!important}
-.logo{width:34px;height:29px;flex:none}
+.ico{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.logo{width:30px;height:26px;flex:none}
 
-/* Pantallas de entrada (conectar, seguridad, bloqueo) */
-.puerta{min-height:100vh;min-height:100dvh;background:#141414;color:#f4ecdc;display:flex;flex-direction:column;justify-content:center;padding:calc(32px + env(safe-area-inset-top)) 24px 32px}
+/* Pantallas de entrada */
+.puerta{min-height:100vh;min-height:100dvh;background:var(--negro);color:var(--crema);display:flex;flex-direction:column;justify-content:center;padding:calc(32px + env(safe-area-inset-top)) 24px 32px}
 .puerta .box{max-width:420px;width:100%;margin:0 auto;display:grid;gap:18px}
 .puerta .logo{width:84px;height:72px}
 .puerta h1{font-size:34px;font-weight:800}
 .puerta p{margin:0;color:#d9cdb8}
-.puerta input{background:#1f1d1a;border-color:#3a352f;color:#f4ecdc}
-.puerta button{background:transparent;color:#f4ecdc;border-color:#6b6358}
-.puerta button.acc{background:#c8102e;border-color:#c8102e;color:#f4ecdc}
-.puerta button.link{color:#d9cdb8;border:0}
+.puerta input{background:#1f1d1a;border-color:#3a352f;color:var(--crema)}
+.puerta button{min-height:50px;border-radius:12px;border:1px solid #6b6358;color:var(--crema);text-align:center;font-weight:600}
+.puerta button.acc{background:#c8102e;border-color:#c8102e}
+.puerta button.link{border:0;color:#d9cdb8;text-decoration:underline;font-weight:500}
 .puerta .err{color:#ff8a8d;min-height:1.5em}
 .puerta small{color:#b5aa98;font-size:13px}
 .pin{letter-spacing:.5em;text-align:center;font-size:26px;font-family:Archivo,Inter,sans-serif}
 .firma-p{color:#6b6358;font-size:13px;text-align:center;margin-top:28px}
 
-/* App */
-header{background:var(--deep);color:#f4ecdc;padding:calc(18px + env(safe-area-inset-top)) 16px 18px}
-.brand{display:flex;align-items:center;gap:12px}
-.brand h1{font-size:24px;font-weight:800;flex:1}
-.secciones{display:flex;gap:8px;overflow-x:auto;margin-top:14px;padding-bottom:4px}
-.secciones button{flex:none;min-height:36px;border-radius:99px;font-size:14px;background:transparent;color:#d9cdb8;border:1px solid #3a352f}
-.secciones button[aria-selected=true]{background:#f4ecdc;color:#141414;border-color:#f4ecdc}
-.secciones button small{opacity:.7;font-weight:500}
-.pronto{text-align:center;padding:40px 16px}
-.pronto h2{font-size:24px}
-.brand button{background:transparent;color:#f4ecdc;border-color:#6b6358;min-height:40px;padding:0 12px;font-size:14px}
-.tot{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-top:12px}
-.big{font-size:44px;font-weight:800;white-space:nowrap}
-.tot small{color:#d9cdb8}
-.acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
-header .acts button{background:transparent;color:#f4ecdc;border-color:#6b6358}
-header .acts button.acc{background:#c8102e;border-color:#c8102e;color:#f4ecdc}
-nav{display:flex;position:sticky;top:0;z-index:5;background:var(--card);border-bottom:1px solid var(--line)}
-nav button{flex:1;border:0;border-radius:0;background:none;border-bottom:3px solid transparent;color:var(--mute)}
-nav button[aria-selected=true]{color:var(--ink);border-bottom-color:var(--acc)}
-main{padding:16px;max-width:900px;margin:0 auto}
-.chips{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px;margin-bottom:12px}
-.chips button{flex:none;min-height:38px;border-radius:99px;font-size:14px}
+/* Cabecera */
+.top{position:sticky;top:0;z-index:10;background:var(--negro);color:var(--crema);padding:calc(10px + env(safe-area-inset-top)) 16px 10px}
+.top-fila{display:flex;align-items:center;gap:10px;max-width:720px;margin:0 auto}
+.top h1{font-size:20px;font-weight:800;flex:1}
+.redondo{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;border:1px solid #3a352f}
+.girando .ico{animation:gira 1s linear infinite}
+@keyframes gira{to{transform:rotate(360deg)}}
+.barra-mes{display:flex;align-items:center;justify-content:space-between;max-width:720px;margin:8px auto 0;background:#1f1d1a;border-radius:12px;padding:2px}
+.barra-mes button{width:48px;height:40px;display:grid;place-items:center;font-size:22px;color:var(--crema)}
+#mes-txt{font-weight:600;text-transform:capitalize}
+
+main{max-width:720px;margin:0 auto;padding:16px 16px calc(96px + env(safe-area-inset-bottom))}
+.tit{font-size:22px;font-weight:800;margin:22px 0 12px}
+
+/* Inicio */
+.hero{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:20px;display:grid;gap:6px}
+.eti{color:var(--mute);font-size:15px}
+.cifra{font-size:clamp(40px,12vw,56px);font-weight:800;letter-spacing:-.01em}
+.delta{font-size:14px;color:var(--mute)}
+.delta.sube{color:var(--rojo)}.delta.baja{color:var(--verde)}
+.pila{display:flex;height:12px;border-radius:99px;overflow:hidden;margin-top:10px;background:var(--line);gap:2px}
+.pila span{height:100%}
+.nada{color:var(--mute);text-align:center;padding:16px 8px;margin:0}
+.alerta{width:100%;margin-top:12px;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 18px;border-radius:16px;background:var(--negro);color:var(--crema);min-height:64px}
+.alerta.mal{background:#c8102e}
+@media(prefers-color-scheme:dark){.alerta{background:#2a2622;border:1px solid #4a443c}.alerta.mal{background:#c8102e;border-color:#c8102e}}
+.alerta.ok{background:var(--card);color:var(--ink);border:1px solid var(--line)}
+.alerta b{display:block;font-size:17px}
+.alerta small{opacity:.8}
+.alerta-val{font-family:Archivo,Inter,sans-serif;font-size:22px;font-weight:700;white-space:nowrap}
+.alerta.ok .alerta-val{color:var(--verde)}
+.aviso-rec{margin-top:12px;padding:12px 16px;border-radius:14px;border:1px dashed var(--rojo);color:var(--ink);font-size:15px}
+.aviso-rec b{color:var(--rojo)}
+.tiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.tile{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px;display:grid;gap:2px;min-height:128px;align-content:start}
+.tile-ico{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;background:var(--c);color:#fff;margin-bottom:8px}
+@media(prefers-color-scheme:dark){.tile-ico{color:#141414}}
+.tile-n{font-weight:600;font-size:15px}
+.tile-v{font-family:Archivo,Inter,sans-serif;font-size:22px;font-weight:700}
+.tile small{color:var(--mute);font-size:13px}
+
+/* Sección */
+.cab-sec{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.cab-sec .tile-ico{margin:0;flex:none}
+.cab-sec h2{font-size:22px;font-weight:800}
+.cab-sec .delta{display:block}
+.cifra-s{font-size:26px;font-weight:800}
+.volver{width:44px;height:44px;font-size:30px;line-height:1;display:grid;place-items:center;border-radius:50%;border:1px solid var(--line);flex:none}
+.chips{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px;margin-bottom:10px}
+.chips button{flex:none;min-height:40px;padding:0 14px;border-radius:99px;border:1px solid var(--line);background:var(--card);font-size:14px;font-weight:600}
 .chips button[aria-pressed=true]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
-.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:10px}
-.it{display:grid;grid-template-columns:12px minmax(0,1fr) auto;gap:10px;align-items:start}
-.dot{width:12px;height:12px;border-radius:50%;margin-top:5px}
-.it b{font-size:17px}.mute{color:var(--mute);font-size:14px}
-.val{font-family:Archivo,Inter,sans-serif;font-size:20px;font-weight:700;text-align:right;white-space:nowrap}
-.tag{display:inline-block;font-size:13px;font-weight:600;padding:1px 8px;border-radius:99px;border:1px solid currentColor;white-space:nowrap}
-.ok{color:var(--ok)}.bad{color:var(--bad)}.wait{color:var(--mute)}
-.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.row button{min-height:38px;font-size:14px}
-.svc{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px}
-.svc .card{margin:0;border-top:5px solid var(--c)}
-.delta{font-size:14px;margin-top:4px}
-.up{color:var(--bad)}.down{color:var(--ok)}
-.bars{display:grid;gap:8px}
-.bar{display:grid;grid-template-columns:64px minmax(0,1fr) 78px;gap:8px;align-items:center;font-size:14px}
-.track{display:flex;height:20px;border-radius:6px;overflow:hidden;background:var(--bg)}
-.num{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
-h2{font-size:20px;margin:18px 0 10px}
-form{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px}
+.comps{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin-bottom:12px}
+.comp{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;display:grid;gap:2px}
+.comp span:first-of-type{font-family:Archivo,Inter,sans-serif;font-size:19px;font-weight:700}
+.comp small{color:var(--mute)}
+.lista{display:grid;gap:8px}
+.fac{width:100%;display:grid;grid-template-columns:40px minmax(0,1fr) auto;gap:12px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px 14px;min-height:64px}
+.fac-ico{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;color:var(--c);background:color-mix(in srgb,var(--c) 14%,transparent)}
+.fac-txt{display:grid;gap:2px}
+.fac-txt b{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fac-txt small{color:var(--mute);font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fac-val{font-family:Archivo,Inter,sans-serif;font-size:18px;font-weight:700;white-space:nowrap}
+.tag{display:inline-block;justify-self:start;font-size:12px;font-weight:600;padding:1px 8px;border-radius:99px;border:1px solid currentColor;color:var(--mute);margin-top:2px;white-space:nowrap}
+.tag.ok{color:var(--verde)}.tag.mal{color:var(--rojo)}
+.nota{color:var(--mute);font-size:14px;text-align:center;margin:18px 8px}
+
+/* Más */
+.menu{display:grid;gap:8px}
+.menu button,.menu .btn{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px 16px;min-height:64px}
+.menu b{display:block;font-weight:600}
+.menu small{color:var(--mute);font-size:13px}
+
+/* Barra inferior */
+.tabbar{position:fixed;left:0;right:0;bottom:0;z-index:10;background:var(--card);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(3,1fr);padding-bottom:env(safe-area-inset-bottom)}
+.tabbar button{display:grid;justify-items:center;gap:2px;padding:8px 4px 10px;font-size:12px;font-weight:600;color:var(--mute);text-align:center;min-height:60px}
+.tabbar button[aria-current=page]{color:var(--ink)}
+.tabbar button[aria-current=page] .ico{stroke:var(--rojo)}
+
+/* Mensajes */
+.msg{position:fixed;left:16px;right:16px;bottom:calc(76px + env(safe-area-inset-bottom));z-index:20;max-width:560px;margin:0 auto;background:var(--negro);color:var(--crema);padding:12px 16px;border-radius:14px;box-shadow:0 6px 20px rgba(0,0,0,.25)}
+.msg.mal{background:#c8102e}
+.aviso{background:var(--card);border:1px dashed var(--line);color:var(--mute);padding:8px 12px;border-radius:12px;margin-bottom:12px;font-size:14px}
+
+/* Hojas inferiores (detalle y formulario) */
+dialog{border:0;padding:0;margin:auto auto 0;width:100%;max-width:560px;border-radius:22px 22px 0 0;background:var(--card);color:var(--ink);max-height:90vh}
+dialog::backdrop{background:rgba(0,0,0,.5)}
+.hoja-in{padding:20px 20px calc(20px + env(safe-area-inset-bottom));display:grid;gap:12px}
+.hoja-in h2{font-size:22px;font-weight:800}
+.hoja-cifra{font-family:Archivo,Inter,sans-serif;font-size:34px;font-weight:800}
+dl{display:grid;grid-template-columns:auto minmax(0,1fr);gap:6px 14px;margin:0;font-size:15px}
+dt{color:var(--mute)}dd{margin:0;text-align:right;overflow-wrap:anywhere}
+.b-grande{width:100%;min-height:52px;border-radius:14px;text-align:center;font-weight:600;border:1px solid var(--line);background:var(--bg)}
+.b-grande.acc{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.b-grande.mal{color:var(--rojo);border-color:var(--rojo)}
+.mover{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px}
+.mover button{padding:0 16px;border-radius:12px;background:var(--ink);color:var(--bg);font-weight:600}
+.peq{color:var(--mute);font-size:13px;margin:-4px 0 0}
+form{display:grid;gap:10px}
 label{display:grid;gap:4px;font-size:14px;color:var(--mute)}
-.full{grid-column:1/-1}
-.empty{text-align:center;color:var(--mute);padding:30px 10px}
-.msg{background:var(--card);border:2px solid var(--acc);padding:10px 14px;border-radius:10px;margin-bottom:12px}
-.aviso{background:var(--card);border:1px dashed var(--line);color:var(--mute);padding:8px 12px;border-radius:10px;margin-bottom:12px;font-size:14px}
-.firma{text-align:center;color:var(--mute);font-size:13px;padding:20px 16px 28px}
-dialog{border:0;border-radius:16px;padding:20px;max-width:420px;width:calc(100% - 32px);background:var(--card);color:var(--ink)}
-dialog::backdrop{background:rgba(0,0,0,.55)}
-dialog h2{margin-top:0}
-dialog .row{flex-direction:column}
-@media(max-width:420px){.svc,form{grid-template-columns:minmax(0,1fr)}.big{font-size:38px}}
-@media(prefers-reduced-motion:no-preference){.card{animation:entra .25s ease-out}@keyframes entra{from{opacity:0;transform:translateY(4px)}}}
+.firma{text-align:center;color:var(--mute);font-size:13px;padding:8px 16px 0}
+@media(prefers-reduced-motion:reduce){.girando .ico{animation:none}}
 </style>
 </head>
 <body>
@@ -108,7 +154,7 @@ dialog .row{flex-direction:column}
   <div class="box">
     <svg class="logo" viewBox="0 0 94 80" aria-hidden="true"><rect x="0" y="56" width="14" height="24" fill="#f4ecdc"/><rect x="20" y="44" width="14" height="36" fill="#f4ecdc"/><rect x="40" y="32" width="14" height="48" fill="#f4ecdc"/><rect x="60" y="20" width="14" height="60" fill="#f4ecdc"/><rect x="80" y="8" width="14" height="72" fill="#ff5a5f"/></svg>
     <h1>Economía del hogar</h1>
-    <p>Conecte la app con su hoja de facturas. Pegue el <b>enlace de conexión</b> que le dio el programa al instalarlo (función «enlaceParaCelular»).</p>
+    <p>Conecte la app con su hoja de facturas. Abra el <b>enlace de conexión</b> que le dio el programa, o péguelo aquí.</p>
     <input id="c-enlace" placeholder="https://script.google.com/macros/s/…/exec?k=…" autocomplete="off" spellcheck="false">
     <button class="acc" id="c-btn">Conectar</button>
     <div class="err" id="c-err" role="alert"></div>
@@ -151,55 +197,66 @@ dialog .row{flex-direction:column}
 
 <!-- 4. La app -->
 <div id="app" class="hidden">
-<header>
-  <div class="brand">
-    <svg class="logo" viewBox="0 0 94 80" aria-label="LACAC"><rect x="0" y="56" width="14" height="24" fill="#f4ecdc"/><rect x="20" y="44" width="14" height="36" fill="#f4ecdc"/><rect x="40" y="32" width="14" height="48" fill="#f4ecdc"/><rect x="60" y="20" width="14" height="60" fill="#f4ecdc"/><rect x="80" y="8" width="14" height="72" fill="#ff5a5f"/></svg>
-    <h1>Economía del hogar</h1>
-    <button id="ajustes" aria-label="Ajustes">Ajustes</button>
-  </div>
-  <div class="secciones" id="secciones" role="tablist" aria-label="Secciones"></div>
-  <div class="tot"><span class="big" id="pend">…</span><small id="pendTxt">Cargando sus facturas…</small></div>
-  <div class="acts"><button class="acc" id="buscar">Buscar facturas en el correo</button><button id="manual">Registrar a mano</button></div>
-</header>
-<nav role="tablist">
-  <button role="tab" data-v="recogidas" aria-selected="true">Recogidas</button>
-  <button role="tab" data-v="meses" aria-selected="false">Por meses</button>
-  <button role="tab" data-v="pendientes" aria-selected="false">Pendientes</button>
-</nav>
-<main>
-  <div class="aviso hidden" id="offline"></div>
+  <header class="top">
+    <div class="top-fila">
+      <svg class="logo" viewBox="0 0 94 80" aria-label="LACAC"><rect x="0" y="56" width="14" height="24" fill="#f4ecdc"/><rect x="20" y="44" width="14" height="36" fill="#f4ecdc"/><rect x="40" y="32" width="14" height="48" fill="#f4ecdc"/><rect x="60" y="20" width="14" height="60" fill="#f4ecdc"/><rect x="80" y="8" width="14" height="72" fill="#ff5a5f"/></svg>
+      <h1>Economía del hogar</h1>
+      <button class="redondo" id="buscar" aria-label="Buscar facturas nuevas en el correo"><svg class="ico" viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.3-5.7"/><path d="M20 4v5h-5"/></svg></button>
+    </div>
+    <div class="barra-mes" id="barra-mes">
+      <button id="mes-ant" aria-label="Mes anterior">‹</button>
+      <span id="mes-txt"></span>
+      <button id="mes-sig" aria-label="Mes siguiente">›</button>
+    </div>
+  </header>
+  <main>
+    <div class="aviso hidden" id="offline"></div>
+    <div id="view"></div>
+    <p class="firma">Una app LACAC · Miguel Gerardo Morocho Loja</p>
+  </main>
   <div class="msg hidden" id="msg" role="status"></div>
-  <div class="card hidden" id="formBox">
-    <h2 style="margin-top:0">Registrar a mano</h2>
-    <form id="form">
-      <label>Servicio<select id="f-servicio"></select></label>
-      <label>Empresa<input id="f-empresa" required></label>
-      <label>Mes del consumo<input id="f-mes" type="month" required></label>
-      <label>Valor ($)<input id="f-valor" type="number" step="0.01" min="0" inputmode="decimal" required></label>
-      <label>Consumo<input id="f-consumo" type="number" step="0.01" min="0" inputmode="decimal"></label>
-      <label>Unidad<input id="f-unidad"></label>
-      <label>Fecha límite<input id="f-vence" type="date"></label>
-      <label>Fecha de pago<input id="f-pagado" type="date"></label>
-      <div class="row full"><button class="pri" type="submit">Guardar</button><button type="button" id="cancel">Cancelar</button></div>
-    </form>
-  </div>
-  <div id="view"></div>
-</main>
-<footer class="firma">Una app LACAC · Miguel Gerardo Morocho Loja</footer>
+  <nav class="tabbar" aria-label="Navegación">
+    <button data-ir="inicio" aria-current="page"><svg class="ico" viewBox="0 0 24 24"><path d="M3 11l9-7 9 7v9h-6v-6H9v6H3z"/></svg>Inicio</button>
+    <button data-ir="pagar"><svg class="ico" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>Por pagar</button>
+    <button data-ir="mas"><svg class="ico" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg>Más</button>
+  </nav>
 </div>
 
-<dialog id="d-ajustes">
-  <h2>Ajustes</h2>
-  <p class="mute" id="d-seg"></p>
-  <div class="row">
-    <button id="d-bloquear">Bloquear ahora</button>
-    <button id="d-cambiar-seg">Cambiar huella o PIN</button>
-    <button id="d-desconectar">Desconectar este celular</button>
-    <button class="pri" id="d-cerrar">Cerrar</button>
+<!-- Detalle de una factura -->
+<dialog id="hoja">
+  <div class="hoja-in">
+    <h2 id="h-tit"></h2>
+    <span class="hoja-cifra" id="h-val"></span>
+    <dl id="h-info"></dl>
+    <button class="b-grande acc" id="h-pagar">Marcar como pagada hoy</button>
+    <button class="b-grande" id="h-deshacer">Deshacer el pago</button>
+    <label>Mover a otra sección
+      <span class="mover"><select id="h-mover"></select><button id="h-mover-ok">Mover</button></span>
+    </label>
+    <p class="peq" id="h-mover-nota"></p>
+    <button class="b-grande mal" id="h-borrar">Eliminar este registro</button>
+    <button class="b-grande" id="h-cerrar">Cerrar</button>
   </div>
 </dialog>
 
+<!-- Registrar a mano -->
+<dialog id="formu">
+  <form id="form" class="hoja-in">
+    <h2>Registrar un gasto</h2>
+    <label>Sección<select id="f-seccion"></select></label>
+    <label id="f-serv-box" class="hidden">Servicio<select id="f-servicio"></select></label>
+    <label>Dónde o qué<input id="f-empresa" required placeholder="Ej.: Mercado 10 de Agosto"></label>
+    <label>Valor ($)<input id="f-valor" type="number" step="0.01" min="0" inputmode="decimal" required></label>
+    <label>Fecha<input id="f-fecha" type="date" required></label>
+    <label>Fecha límite (solo servicios)<input id="f-vence" type="date"></label>
+    <label>Fecha de pago<input id="f-pagado" type="date"></label>
+    <button class="b-grande acc" type="submit">Guardar</button>
+    <button class="b-grande" type="button" id="f-cancelar">Cancelar</button>
+  </form>
+</dialog>
+
 <script>
+
 {
 /* ───────── Datos guardados en este celular ───────── */
 const K = { con: 'lacac.eh.conexion', cred: 'lacac.eh.huella', pin: 'lacac.eh.pin', cache: 'lacac.eh.cache', cacheT: 'lacac.eh.cacheT' };
@@ -210,7 +267,7 @@ const store = {
 };
 const $ = id => document.getElementById(id);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-const PANTALLAS = ['p-conectar', 'p-seguridad', 'p-bloqueo', 'app'];
+const PANTALLAS = ["p-conectar", "p-seguridad", "p-bloqueo", "app"];
 function ver(id) { PANTALLAS.forEach(p => $(p).classList.toggle('hidden', p !== id)); }
 const b64 = buf => btoa(String.fromCharCode(...new Uint8Array(buf)));
 const deB64 = s => Uint8Array.from(atob(s), c => c.charCodeAt(0));
@@ -325,150 +382,258 @@ document.addEventListener('visibilitychange', () => {
 });
 
 /* ───────── 4. La app ───────── */
-const SV = { 'Agua potable': ['--agua', 'm³'], 'Luz eléctrica': ['--luz', 'kWh'], 'Teléfono': ['--tel', 'min'], 'Internet': ['--net', ''], 'Recolección de basura': ['--basura', ''], 'Otro': ['--otro', ''] };
-const MES = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
+const SECS = [
+  { n: 'Servicios básicos', c: '--s1', i: '<path d="M13 2 4 14h7l-1 8 9-12h-7z"/>' },
+  { n: 'Alimentación', c: '--s2', i: '<path d="M3 10h18l-2 10H5z"/><path d="M8 10l4-6 4 6"/>' },
+  { n: 'Salud', c: '--s3', i: '<rect x="3" y="3" width="18" height="18" rx="4"/><path d="M12 8v8M8 12h8"/>' },
+  { n: 'Educación', c: '--s4', i: '<path d="M2 7l10-4 10 4-10 4z"/><path d="M6 9v5c0 2 3 3 6 3s6-1 6-3V9"/>' },
+  { n: 'Vivienda y hogar', c: '--s5', i: '<path d="M3 11l9-7 9 7v9H3z"/><path d="M9 20v-6h6v6"/>' },
+  { n: 'Vestimenta', c: '--s6', i: '<path d="M8 3l4 2 4-2 5 4-3 3v11H6V10L3 7z"/>' },
+  { n: 'Transporte', c: '--s7', i: '<path d="M5 16l1.5-6h11l1.5 6"/><rect x="3" y="16" width="18" height="3" rx="1"/><circle cx="7" cy="20" r="1"/><circle cx="17" cy="20" r="1"/>' },
+  { n: 'Otros', c: '--s8', i: '<circle cx="6" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="18" cy="12" r="1.6"/>' }
+];
+const SERV = { 'Agua potable': 'm³', 'Luz eléctrica': 'kWh', 'Teléfono': '', 'Internet': '', 'Recolección de basura': '' };
+const MESES = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+const sec = n => SECS.find(x => x.n === n) || SECS[7];
+const icono = (n, cls) => `<svg class="${cls || 'ico'}" viewBox="0 0 24 24" aria-hidden="true">${sec(n).i}</svg>`;
 const money = n => '$' + (Number(n) || 0).toLocaleString('es-EC', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-const mesTxt = (m, largo) => { if (!m || !m.includes('-')) return esc(m); const [y, mm] = m.split('-'); return MES[+mm - 1] + ' ' + (largo ? y : y.slice(2)); };
+const mesLargo = m => { if (!m || !m.includes('-')) return esc(m); const [y, mm] = m.split('-'); return MESES[+mm - 1] + ' ' + y; };
+const mesCorto = m => { if (!m || !m.includes('-')) return esc(m); const [y, mm] = m.split('-'); return MESES[+mm - 1].slice(0, 3) + ' ' + y.slice(2); };
 const fecha = d => d ? d.split('-').reverse().join('/') : '';
 const hoy = () => { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); };
 const dias = d => Math.round((new Date(d + 'T00:00') - new Date(hoy() + 'T00:00')) / 864e5);
-const color = s => `var(${(SV[s] || SV.Otro)[0]})`;
-let datos = [], vista = 'recogidas', filtro = 'Todos', mesSel = '';
+const mesAnterior = m => { const [y, mm] = m.split('-').map(Number); const d = new Date(y, mm - 2, 1); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0'); };
+const mesSiguiente = m => { const [y, mm] = m.split('-').map(Number); const d = new Date(y, mm, 1); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0'); };
 
-function say(t) { $('msg').textContent = t; $('msg').classList.toggle('hidden', !t); }
+let datos = [], vista = 'inicio', mes = hoy().slice(0, 7), secAbierta = '', subFiltro = 'Todos', idHoja = '';
+
+function say(t, tipo) { const m = $('msg'); m.textContent = t; m.className = 'msg' + (tipo ? ' ' + tipo : ''); m.classList.toggle('hidden', !t); if (t) setTimeout(() => m.classList.add('hidden'), 6000); }
 function guardarCache(d) { store.set(K.cache, JSON.stringify(d)); store.set(K.cacheT, String(Date.now())); }
-function poner(d) { datos = d || []; guardarCache(datos); $('offline').classList.add('hidden'); render(); }
+function poner(d) { datos = (d || []).map(r => Object.assign({ seccion: 'Servicios básicos', recargos: 0 }, r)); guardarCache(datos); $('offline').classList.add('hidden'); render(); }
 function fallo(e) {
-  if (/clave/.test(e.message)) { say(e.message); return; }
+  if (/clave/.test(e.message)) { say(e.message, 'mal'); return; }
   const t = Number(store.get(K.cacheT));
-  $('offline').textContent = 'Sin conexión con su hoja. Mostrando los datos guardados' + (t ? ' del ' + new Date(t).toLocaleString('es-EC', { dateStyle: 'short', timeStyle: 'short' }) : '') + '.';
+  $('offline').textContent = 'Sin conexión. Mostrando los datos guardados' + (t ? ' del ' + new Date(t).toLocaleString('es-EC', { dateStyle: 'short', timeStyle: 'short' }) : '') + '.';
   $('offline').classList.remove('hidden');
 }
 
-function estado(r) {
-  if (r.pagado) return `<span class="tag ok">Pagada ${esc(fecha(r.pagado))}</span>`;
-  if (!r.vence) return '<span class="tag wait">Pendiente</span>';
-  const d = dias(r.vence);
-  return d < 0 ? `<span class="tag bad">Vencida hace ${-d} d</span>` : `<span class="tag wait">Vence ${d === 0 ? 'hoy' : 'en ' + d + ' d'}</span>`;
-}
-function item(r) {
-  return `<div class="card"><div class="it"><span class="dot" style="background:${color(r.servicio)}"></span>
-    <div><b>${esc(r.servicio)}</b> · ${mesTxt(r.mes, true)}<div class="mute">${esc(r.empresa)}${r.consumo !== '' ? ' · ' + esc(r.consumo) + ' ' + esc(r.unidad) : ''}${r.factura ? ' · Fact. ' + esc(r.factura) : ''}</div>
-    <div style="margin-top:4px">${estado(r)} <span class="mute">${r.origen === 'Manual' ? '· a mano' : '· del correo'}</span></div></div>
-    <div class="val">${money(r.valor)}</div></div>
-    <div class="row">${r.pagado ? `<button data-unpay="${esc(r.id)}">Deshacer pago</button>` : `<button class="acc" data-pay="${esc(r.id)}">Pagada hoy</button>`}
-    ${r.origen === 'Manual' ? `<button data-del="${esc(r.id)}">Eliminar</button>` : ''}</div></div>`;
-}
-const ordenados = () => datos.slice().sort((a, b) => (b.mes || '').localeCompare(a.mes || '') || a.servicio.localeCompare(b.servicio));
-const usadosSV = () => Object.keys(SV).filter(s => datos.some(r => r.servicio === s));
+const delMes = (m, s) => datos.filter(r => r.mes === m && (!s || r.seccion === s));
+const suma = l => l.reduce((a, r) => a + r.valor, 0);
+const porPagar = () => datos.filter(r => r.seccion === 'Servicios básicos' && !r.pagado).sort((a, b) => (a.vence || '9').localeCompare(b.vence || '9'));
 
-function vRecogidas() {
-  const usados = ['Todos', ...usadosSV()];
-  if (!usados.includes(filtro)) filtro = 'Todos';
-  const lista = ordenados().filter(r => filtro === 'Todos' || r.servicio === filtro);
-  return `<div class="chips">${usados.map(s => `<button data-f="${esc(s)}" aria-pressed="${s === filtro}">${esc(s)}</button>`).join('')}</div>` +
-    (lista.length ? lista.map(item).join('') : '<p class="empty">Aún no hay facturas. Pulse «Buscar facturas en el correo».</p>');
+function delta(a, b, fmt, mesPrev) {
+  if (b == null || (b === 0 && a === 0)) return '';
+  const d = a - b;
+  if (Math.abs(d) < 0.005) return `<span class="delta">igual que ${esc(mesCorto(mesPrev))}</span>`;
+  return `<span class="delta ${d > 0 ? 'sube' : 'baja'}">${d > 0 ? '▲' : '▼'} ${fmt(Math.abs(d))} ${d > 0 ? 'más' : 'menos'} que ${esc(mesCorto(mesPrev))}</span>`;
 }
-const sumaMes = (m, s) => datos.filter(r => r.mes === m && (!s || r.servicio === s)).reduce((a, r) => a + r.valor, 0);
-function consumoMes(m, s) { const r = datos.filter(x => x.mes === m && x.servicio === s && x.consumo !== ''); return r.length ? r.reduce((a, x) => a + Number(x.consumo), 0) : null; }
-function vMeses() {
-  const meses = [...new Set(datos.map(r => r.mes).filter(Boolean))].sort().reverse();
-  if (!meses.length) return '<p class="empty">Cuando haya facturas, aquí verá cada mes con su comparación.</p>';
-  if (!meses.includes(mesSel)) mesSel = meses[0];
-  const prev = meses[meses.indexOf(mesSel) + 1] || '';
-  const total = sumaMes(mesSel), tprev = prev ? sumaMes(prev) : null;
-  const delta = (a, b, fmt) => { if (b == null) return ''; const d = a - b; if (Math.abs(d) < 0.005) return `<div class="delta mute">Igual que ${mesTxt(prev)}</div>`;
-    return `<div class="delta ${d > 0 ? 'up' : 'down'}">${d > 0 ? '▲' : '▼'} ${fmt(Math.abs(d))} ${d > 0 ? 'más' : 'menos'} que ${mesTxt(prev)}</div>`; };
-  const servs = Object.keys(SV).filter(s => datos.some(r => r.mes === mesSel && r.servicio === s));
-  const ult = meses.slice(0, 12).reverse(), max = Math.max(1, ...ult.map(m => sumaMes(m)));
-  return `<div class="chips">${meses.map(m => `<button data-m="${esc(m)}" aria-pressed="${m === mesSel}">${mesTxt(m, true)}</button>`).join('')}</div>
-  <div class="card"><span class="mute">Total de ${mesTxt(mesSel, true)}</span><br><span class="big">${money(total)}</span>${delta(total, tprev, money)}</div>
-  <div class="svc">${servs.map(s => { const v = sumaMes(mesSel, s), c = consumoMes(mesSel, s), un = (datos.find(r => r.servicio === s && r.unidad) || {}).unidad || SV[s][1];
-    const pend = datos.some(r => r.mes === mesSel && r.servicio === s && !r.pagado);
-    const tienePrev = prev && datos.some(r => r.mes === prev && r.servicio === s);
-    return `<div class="card" style="--c:${color(s)}"><b>${esc(s)}</b><div class="val" style="text-align:left">${money(v)}</div>
-      ${c != null ? `<div class="mute">${esc(c)} ${esc(un)}</div>` : ''}${delta(v, tienePrev ? sumaMes(prev, s) : null, money)}
-      ${c != null && tienePrev && consumoMes(prev, s) != null ? delta(c, consumoMes(prev, s), n => n.toFixed(1) + ' ' + un) : ''}
-      <div style="margin-top:6px">${pend ? '<span class="tag wait">Por pagar</span>' : '<span class="tag ok">Pagado</span>'}</div></div>`; }).join('')}</div>
-  <h2>Últimos meses</h2>
-  <div class="card bars">${ult.map(m => `<div class="bar"><span>${mesTxt(m)}</span><div class="track">${Object.keys(SV).map(s => { const v = sumaMes(m, s); return v ? `<span style="width:${v / max * 100}%;background:${color(s)}"></span>` : ''; }).join('')}</div><span class="num">${money(sumaMes(m))}</span></div>`).join('')}</div>`;
+
+function estado(r) {
+  if (r.seccion !== 'Servicios básicos') return '';
+  if (r.pagado) return `<span class="tag ok">Pagada ${esc(fecha(r.pagado))}</span>`;
+  if (!r.vence) return '<span class="tag">Pendiente</span>';
+  const d = dias(r.vence);
+  return d < 0 ? `<span class="tag mal">Vencida hace ${-d} d</span>` : `<span class="tag">Vence ${d === 0 ? 'hoy' : d === 1 ? 'mañana' : 'en ' + d + ' días'}</span>`;
 }
-function vPendientes() {
-  const p = datos.filter(r => !r.pagado).sort((a, b) => (a.vence || '9').localeCompare(b.vence || '9'));
-  return p.length ? p.map(item).join('') : '<p class="empty">Todo al día: no tiene facturas por pagar.</p>';
+function filaFactura(r) {
+  const titulo = r.seccion === 'Servicios básicos' && r.servicio ? r.servicio : r.empresa;
+  const sub = [r.seccion === 'Servicios básicos' && r.servicio ? r.empresa : '', r.consumo !== '' && r.consumo != null ? r.consumo + ' ' + r.unidad : '', r.emision ? fecha(r.emision) : ''].filter(Boolean).join(' · ');
+  return `<button class="fac" data-id="${esc(r.id)}" style="--c:var(${sec(r.seccion).c})">
+    <span class="fac-ico">${icono(r.seccion)}</span>
+    <span class="fac-txt"><b>${esc(titulo)}</b><small>${esc(sub)}</small>${estado(r)}${r.recargos > 0 ? `<span class="tag mal">Recargos ${money(r.recargos)}</span>` : ''}</span>
+    <span class="fac-val">${money(r.valor)}</span></button>`;
 }
-const SECCIONES = [
-  { id: 'servicios', nombre: 'Servicios básicos', lista: true },
-  { id: 'alimentacion', nombre: 'Alimentación' }, { id: 'salud', nombre: 'Salud' }, { id: 'educacion', nombre: 'Educación' },
-  { id: 'vivienda', nombre: 'Vivienda y hogar' }, { id: 'vestimenta', nombre: 'Vestimenta' }, { id: 'transporte', nombre: 'Transporte' }, { id: 'otros', nombre: 'Otros' }
-];
-let seccion = 'servicios';
-function pintarSecciones() {
-  $('secciones').innerHTML = SECCIONES.map(x => `<button role="tab" data-s="${x.id}" aria-selected="${x.id === seccion}">${esc(x.nombre)}${x.lista ? '' : ' <small>· pronto</small>'}</button>`).join('');
+
+/* Inicio */
+function vInicio() {
+  const lista = delMes(mes), total = suma(lista);
+  const prev = mesAnterior(mes), totalPrev = suma(delMes(prev));
+  const pend = porPagar(), vencidas = pend.filter(r => r.vence && dias(r.vence) < 0);
+  const anio = mes.slice(0, 4);
+  const recAnio = datos.filter(r => r.mes.slice(0, 4) === anio).reduce((a, r) => a + (r.recargos || 0), 0);
+  const conDatos = SECS.map(s => ({ s, v: suma(delMes(mes, s.n)), n: delMes(mes, s.n).length }));
+  const barra = total > 0 ? conDatos.filter(x => x.v > 0).map(x => `<span style="width:${x.v / total * 100}%;background:var(${x.s.c})" title="${esc(x.s.n)}"></span>`).join('') : '';
+  return `
+  <section class="hero">
+    <span class="eti">Gastó en ${esc(mesLargo(mes))}</span>
+    <span class="cifra">${money(total)}</span>
+    ${delta(total, totalPrev || (delMes(prev).length ? 0 : null), money, prev)}
+    ${barra ? `<div class="pila">${barra}</div>` : '<p class="nada">Aún no hay facturas de este mes.</p>'}
+  </section>
+  ${pend.length ? `<button class="alerta ${vencidas.length ? 'mal' : ''}" data-ir="pagar">
+     <span><b>${vencidas.length ? vencidas.length + ' vencida' + (vencidas.length > 1 ? 's' : '') : 'Por pagar'}</b><small>${pend.length} factura${pend.length > 1 ? 's' : ''} de servicios</small></span>
+     <span class="alerta-val">${money(suma(pend))} ›</span></button>`
+   : `<div class="alerta ok"><span><b>Todo al día</b><small>No tiene servicios por pagar</small></span><span class="alerta-val">✓</span></div>`}
+  ${recAnio > 0 ? `<div class="aviso-rec"><b>${money(recAnio)}</b> pagados en ${anio} por recargos (mora, cortes, reconexión). Pagar a tiempo los evita.</div>` : ''}
+  <h2 class="tit">Secciones</h2>
+  <div class="tiles">${conDatos.map(x => `
+    <button class="tile" data-sec="${esc(x.s.n)}" style="--c:var(${x.s.c})">
+      <span class="tile-ico">${icono(x.s.n)}</span>
+      <span class="tile-n">${esc(x.s.n)}</span>
+      <span class="tile-v">${x.v ? money(x.v) : '—'}</span>
+      <small>${x.n ? x.n + ' factura' + (x.n > 1 ? 's' : '') : 'sin facturas'}</small>
+    </button>`).join('')}</div>`;
 }
-$('secciones').addEventListener('click', e => { const b = e.target.closest('button'); if (b) { seccion = b.dataset.s; render(); } });
-function vPronto() {
-  const x = SECCIONES.find(z => z.id === seccion);
-  return `<div class="card pronto"><h2>${esc(x.nombre)}</h2><p class="mute">Esta sección se activará en la próxima versión: leerá sus facturas de ${esc(x.nombre.toLowerCase())} del mismo correo, sin que tenga que hacer nada.</p></div>`;
+
+/* Sección */
+function vSeccion() {
+  const s = sec(secAbierta);
+  let lista = delMes(mes, s.n);
+  const prev = mesAnterior(mes);
+  const total = suma(lista), totalPrev = suma(delMes(prev, s.n));
+  let extra = '';
+  if (s.n === 'Servicios básicos') {
+    const usados = Object.keys(SERV).filter(x => lista.some(r => r.servicio === x));
+    if (usados.length > 1) {
+      if (!['Todos', ...usados].includes(subFiltro)) subFiltro = 'Todos';
+      extra += `<div class="chips">${['Todos', ...usados].map(x => `<button data-sub="${esc(x)}" aria-pressed="${x === subFiltro}">${esc(x)}</button>`).join('')}</div>`;
+      if (subFiltro !== 'Todos') lista = lista.filter(r => r.servicio === subFiltro);
+    }
+    const comp = usados.map(x => {
+      const v = suma(delMes(mes, s.n).filter(r => r.servicio === x));
+      const ant = delMes(prev, s.n).filter(r => r.servicio === x);
+      const c = delMes(mes, s.n).filter(r => r.servicio === x && r.consumo !== '' && r.consumo != null).reduce((a, r) => a + Number(r.consumo), 0);
+      const cAnt = ant.filter(r => r.consumo !== '' && r.consumo != null).reduce((a, r) => a + Number(r.consumo), 0);
+      return `<div class="comp"><b>${esc(x)}</b><span>${money(v)}</span>${ant.length ? delta(v, suma(ant), money, prev) : ''}${c ? `<small>${c} ${SERV[x]}${cAnt ? ' · ' + delta(c, cAnt, n => n + ' ' + SERV[x], prev) : ''}</small>` : ''}</div>`;
+    }).join('');
+    if (comp) extra = `<div class="comps">${comp}</div>` + extra;
+  }
+  return `
+  <div class="cab-sec" style="--c:var(${s.c})">
+    <button class="volver" data-ir="inicio" aria-label="Volver">‹</button>
+    <span class="tile-ico">${icono(s.n)}</span>
+    <div><h2>${esc(s.n)}</h2><span class="cifra-s">${money(total)}</span> ${delta(total, delMes(prev, s.n).length ? totalPrev : null, money, prev)}</div>
+  </div>
+  ${extra}
+  <div class="lista">${lista.length ? lista.map(filaFactura).join('') : `<p class="nada">No hay facturas de ${esc(s.n.toLowerCase())} en ${esc(mesLargo(mes))}.</p>`}</div>`;
+}
+
+/* Por pagar */
+function vPagar() {
+  const p = porPagar();
+  return `<h2 class="tit">Por pagar</h2>
+  <div class="lista">${p.length ? p.map(filaFactura).join('') : '<p class="nada">Todo al día: no tiene servicios por pagar.</p>'}</div>
+  <p class="nota">Las compras (alimentación, salud, ropa…) se pagan al momento de comprar, por eso no aparecen aquí.</p>`;
+}
+
+/* Más */
+function vMas() {
+  return `<h2 class="tit">Más</h2>
+  <div class="menu">
+    <button data-accion="manual"><b>Registrar un gasto a mano</b><small>Para compras sin factura electrónica</small></button>
+    <a class="btn" href="https://srienlinea.sri.gob.ec/" target="_blank" rel="noopener"><b>SRI en línea</b><small>Abre la página del SRI (declaraciones y gastos personales)</small></a>
+    <button data-accion="bloquear"><b>Bloquear ahora</b><small>Pedirá la huella para volver a entrar</small></button>
+    <button data-accion="seguridad"><b>Cambiar huella o PIN</b><small id="m-seg"></small></button>
+    <button data-accion="desconectar"><b>Desconectar este celular</b><small>Borra la conexión y los datos guardados aquí</small></button>
+  </div>
+  <p class="nota">Sus facturas viven en su propia hoja de Google. Esta app solo las muestra en su celular.</p>`;
 }
 
 function render() {
-  pintarSecciones();
-  const activa = SECCIONES.find(z => z.id === seccion).lista;
-  document.querySelector('nav').classList.toggle('hidden', !activa);
-  $('buscar').classList.toggle('hidden', !activa); $('manual').classList.toggle('hidden', !activa);
-  if (!activa) { $('view').innerHTML = vPronto(); return; }
-  const pend = datos.filter(r => !r.pagado);
-  $('pend').textContent = money(pend.reduce((a, r) => a + r.valor, 0));
-  $('pendTxt').textContent = pend.length ? `pendiente · ${pend.length} factura${pend.length > 1 ? 's' : ''} sin pagar` : 'pendiente · todo al día';
-  document.querySelectorAll('nav button').forEach(b => b.setAttribute('aria-selected', b.dataset.v === vista));
-  $('view').innerHTML = vista === 'meses' ? vMeses() : vista === 'pendientes' ? vPendientes() : vRecogidas();
+  document.querySelectorAll('.tabbar button').forEach(b => b.setAttribute('aria-current', b.dataset.ir === (vista === 'seccion' ? 'inicio' : vista) ? 'page' : 'false'));
+  $('mes-txt').textContent = mesLargo(mes);
+  $('mes-sig').disabled = mes >= hoy().slice(0, 7);
+  $('barra-mes').classList.toggle('hidden', vista === 'pagar' || vista === 'mas');
+  $('view').innerHTML = vista === 'seccion' ? vSeccion() : vista === 'pagar' ? vPagar() : vista === 'mas' ? vMas() : vInicio();
+  if (vista === 'mas') $('m-seg').textContent = store.get(K.cred) ? 'Ahora: huella del celular' : 'Ahora: PIN';
+  window.scrollTo(0, 0);
 }
 
-document.querySelector('nav').addEventListener('click', e => { const b = e.target.closest('button'); if (b) { vista = b.dataset.v; render(); } });
+/* Navegación */
+function ir(v) { vista = v; render(); }
+document.querySelector('.tabbar').addEventListener('click', e => { const b = e.target.closest('button'); if (b) ir(b.dataset.ir); });
+$('mes-ant').addEventListener('click', () => { mes = mesAnterior(mes); render(); });
+$('mes-sig').addEventListener('click', () => { mes = mesSiguiente(mes); render(); });
 $('view').addEventListener('click', e => {
   const b = e.target.closest('button'); if (!b) return;
-  if (b.dataset.f) { filtro = b.dataset.f; render(); }
-  if (b.dataset.m) { mesSel = b.dataset.m; render(); }
-  if (b.dataset.pay) { b.disabled = true; api('pagar', { id: b.dataset.pay, fecha: hoy() }).then(j => poner(j.datos), e2 => { b.disabled = false; say('No se pudo guardar el pago: ' + e2.message); }); }
-  if (b.dataset.unpay) { b.disabled = true; api('pagar', { id: b.dataset.unpay, fecha: '' }).then(j => poner(j.datos), e2 => { b.disabled = false; say('No se pudo deshacer: ' + e2.message); }); }
-  if (b.dataset.del) { if (b.dataset.sure) { b.disabled = true; api('borrar', { id: b.dataset.del }).then(j => poner(j.datos), e2 => say(e2.message)); } else { b.dataset.sure = '1'; b.textContent = '¿Seguro?'; } }
-});
-$('buscar').addEventListener('click', () => {
-  const b = $('buscar'); b.disabled = true; b.textContent = 'Revisando el correo…'; say('');
-  api('buscar').then(j => { poner(j.datos); say(j.nuevas ? `Se recogieron ${j.nuevas} factura(s) nueva(s).` : 'No hay facturas nuevas en el correo.'); }, e => say('No se pudo revisar el correo: ' + e.message))
-    .finally(() => { b.disabled = false; b.textContent = 'Buscar facturas en el correo'; });
-});
-$('f-servicio').innerHTML = Object.keys(SV).map(s => `<option>${s}</option>`).join('');
-$('f-servicio').addEventListener('change', e => { $('f-unidad').value = SV[e.target.value][1]; });
-$('manual').addEventListener('click', () => { $('formBox').classList.remove('hidden'); $('f-mes').value = hoy().slice(0, 7); $('f-unidad').value = SV[$('f-servicio').value][1]; $('formBox').scrollIntoView({ behavior: 'smooth' }); });
-$('cancel').addEventListener('click', () => $('formBox').classList.add('hidden'));
-$('form').addEventListener('submit', e => {
-  e.preventDefault();
-  const o = {}; ['servicio', 'empresa', 'mes', 'valor', 'consumo', 'unidad', 'vence', 'pagado'].forEach(k => o[k] = $('f-' + k).value.trim());
-  api('manual', { o: JSON.stringify(o) }).then(j => { poner(j.datos); $('form').reset(); $('formBox').classList.add('hidden'); say('Registro guardado.'); }, e2 => say('No se pudo guardar: ' + e2.message));
+  if (b.dataset.ir) ir(b.dataset.ir);
+  else if (b.dataset.sec) { secAbierta = b.dataset.sec; subFiltro = 'Todos'; ir('seccion'); }
+  else if (b.dataset.sub) { subFiltro = b.dataset.sub; render(); }
+  else if (b.dataset.id) abrirFactura(b.dataset.id);
+  else if (b.dataset.accion) accion(b.dataset.accion, b);
 });
 
-/* Ajustes */
-$('ajustes').addEventListener('click', () => {
-  $('d-seg').textContent = store.get(K.cred) ? 'Protección: huella del celular.' : 'Protección: PIN.';
-  $('d-ajustes').showModal();
-});
-$('d-cerrar').addEventListener('click', () => $('d-ajustes').close());
-$('d-bloquear').addEventListener('click', () => { $('d-ajustes').close(); mostrarBloqueo(); });
-$('d-cambiar-seg').addEventListener('click', () => { $('d-ajustes').close(); ver('p-seguridad'); prepararSeguridad(); });
-$('d-desconectar').addEventListener('click', e => {
+/* Hoja de detalle de una factura */
+function abrirFactura(id) {
+  const r = datos.find(x => x.id === id); if (!r) return;
+  idHoja = id;
+  $('h-tit').textContent = r.seccion === 'Servicios básicos' && r.servicio ? r.servicio : r.empresa;
+  $('h-val').textContent = money(r.valor);
+  $('h-info').innerHTML = [
+    ['Empresa', r.empresa], ['Sección', r.seccion], ['Mes', mesLargo(r.mes)], ['Emisión', fecha(r.emision)],
+    r.vence ? ['Fecha límite', fecha(r.vence)] : null, r.pagado ? ['Pagada', fecha(r.pagado)] : null,
+    r.consumo !== '' && r.consumo != null ? ['Consumo', r.consumo + ' ' + r.unidad] : null,
+    r.recargos > 0 ? ['Recargos', money(r.recargos)] : null, r.factura ? ['Factura', r.factura] : null
+  ].filter(Boolean).map(([k, v]) => `<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join('');
+  const esServ = r.seccion === 'Servicios básicos';
+  $('h-pagar').classList.toggle('hidden', !esServ || !!r.pagado);
+  $('h-deshacer').classList.toggle('hidden', !esServ || !r.pagado);
+  $('h-borrar').classList.toggle('hidden', r.origen !== 'Manual');
+  $('h-borrar').textContent = 'Eliminar este registro'; delete $('h-borrar').dataset.sure;
+  $('h-mover').innerHTML = SECS.map(s => `<option ${s.n === r.seccion ? 'selected' : ''}>${esc(s.n)}</option>`).join('');
+  $('h-mover-nota').textContent = r.ruc ? 'Todas las facturas de este local irán a la sección que elija, también las futuras.' : '';
+  $('hoja').showModal();
+}
+function cerrarHoja() { $('hoja').close(); }
+$('h-cerrar').addEventListener('click', cerrarHoja);
+$('hoja').addEventListener('click', e => { if (e.target === $('hoja')) cerrarHoja(); });
+function operar(a, extra, ok) {
+  cerrarHoja();
+  api(a, extra).then(j => { poner(j.datos); if (ok) say(ok, 'bien'); }, e => say('No se pudo guardar: ' + e.message, 'mal'));
+}
+$('h-pagar').addEventListener('click', () => operar('pagar', { id: idHoja, fecha: hoy() }, 'Marcada como pagada.'));
+$('h-deshacer').addEventListener('click', () => operar('pagar', { id: idHoja, fecha: '' }, 'Pago deshecho.'));
+$('h-mover-ok').addEventListener('click', () => operar('mover', { id: idHoja, seccion: $('h-mover').value }, 'Listo: movida a ' + $('h-mover').value + '.'));
+$('h-borrar').addEventListener('click', e => {
   const b = e.currentTarget;
-  if (!b.dataset.sure) { b.dataset.sure = '1'; b.textContent = 'Toque otra vez para desconectar'; return; }
-  Object.values(K).forEach(store.del);
-  location.reload();
+  if (!b.dataset.sure) { b.dataset.sure = '1'; b.textContent = 'Toque otra vez para eliminar'; return; }
+  operar('borrar', { id: idHoja }, 'Registro eliminado.');
 });
+
+/* Buscar facturas nuevas */
+$('buscar').addEventListener('click', () => {
+  const b = $('buscar'); b.disabled = true; b.classList.add('girando'); say('Revisando su correo…');
+  api('buscar').then(j => { poner(j.datos); say(j.nuevas ? `Se recogieron ${j.nuevas} factura(s) nueva(s).` : 'No hay facturas nuevas en el correo.', 'bien'); }, e => say('No se pudo revisar el correo: ' + e.message, 'mal'))
+    .finally(() => { b.disabled = false; b.classList.remove('girando'); });
+});
+
+/* Registrar a mano */
+$('f-seccion').innerHTML = SECS.map(s => `<option>${esc(s.n)}</option>`).join('');
+$('f-servicio').innerHTML = '<option value=""></option>' + Object.keys(SERV).map(s => `<option>${esc(s)}</option>`).join('');
+$('f-seccion').addEventListener('change', () => $('f-serv-box').classList.toggle('hidden', $('f-seccion').value !== 'Servicios básicos'));
+$('f-cancelar').addEventListener('click', () => $('formu').close());
+$('form').addEventListener('submit', e => {
+  e.preventDefault();
+  const o = {}; ['seccion', 'servicio', 'empresa', 'valor', 'fecha', 'vence', 'pagado'].forEach(k => o[k] = $('f-' + k).value.trim());
+  o.mes = (o.fecha || hoy()).slice(0, 7);
+  if (o.seccion !== 'Servicios básicos') { o.servicio = ''; o.pagado = o.pagado || o.fecha || hoy(); }
+  $('formu').close();
+  api('manual', { o: JSON.stringify(o) }).then(j => { poner(j.datos); $('form').reset(); say('Gasto registrado.', 'bien'); }, e2 => say('No se pudo guardar: ' + e2.message, 'mal'));
+});
+
+/* Acciones de «Más» */
+function accion(a, b) {
+  if (a === 'manual') { $('form').reset(); $('f-fecha').value = hoy(); $('f-serv-box').classList.add('hidden'); $('formu').showModal(); }
+  if (a === 'bloquear') mostrarBloqueo();
+  if (a === 'seguridad') { ver('p-seguridad'); prepararSeguridad(); }
+  if (a === 'desconectar') {
+    if (!b.dataset.sure) { b.dataset.sure = '1'; b.querySelector('b').textContent = 'Toque otra vez para desconectar'; return; }
+    Object.values(K).forEach(store.del); location.reload();
+  }
+}
 
 function entrar() {
   ver('app');
   const c = store.get(K.cache);
-  if (c) { try { datos = JSON.parse(c); render(); } catch (e) {} }
-  api('datos').then(j => poner(j.datos), fallo);
+  if (c) { try { datos = JSON.parse(c); } catch (e) { datos = []; } }
+  const ultimo = datos.map(r => r.mes).filter(Boolean).sort().pop();
+  if (ultimo && !delMes(mes).length) mes = ultimo;
+  render();
+  api('datos').then(j => {
+    const primeraVez = !datos.length;
+    poner(j.datos);
+    if (primeraVez) { const u = datos.map(r => r.mes).filter(Boolean).sort().pop(); if (u && !delMes(mes).length) { mes = u; render(); } }
+  }, fallo);
 }
 
 /* ───────── Arranque ───────── */
