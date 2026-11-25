@@ -93,6 +93,18 @@ main{max-width:720px;margin:0 auto;padding:16px 16px calc(96px + env(safe-area-i
 .cifra-s{font-size:26px;font-weight:800}
 .volver{width:44px;height:44px;font-size:30px;line-height:1;display:grid;place-items:center;border-radius:50%;border:1px solid var(--line);flex:none}
 .chips{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px;margin-bottom:10px}
+.franja{background:var(--card);border:1px solid var(--line);border-left:6px solid var(--c);border-radius:16px;padding:14px 16px;margin-bottom:10px;display:grid;gap:6px}
+.franja>b{font-family:Archivo,Inter,sans-serif;font-size:18px;text-transform:uppercase;letter-spacing:.02em}
+.franja-fila{display:flex;justify-content:space-between;gap:10px;font-size:15px}
+.franja-fila span{color:var(--mute)}
+.franja-fila strong{font-family:Archivo,Inter,sans-serif}
+.dos{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.mini{display:grid;gap:2px;text-align:left;padding:12px 14px;border-radius:14px;background:var(--card);border:2px solid var(--line);min-height:44px}
+.mini span{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.03em}
+.mini b{font-family:Archivo,Inter,sans-serif;font-size:17px}
+.mini small{color:var(--mute);font-size:12px}
+.mini.ok span{color:var(--verde)}.mini.pend span{color:var(--rojo)}
+.mini[aria-pressed=true]{border-color:var(--ink)}
 .chips button{flex:none;min-height:40px;padding:0 14px;border-radius:99px;border:1px solid var(--line);background:var(--card);font-size:14px;font-weight:600}
 .chips button[aria-pressed=true]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
 .comps{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin-bottom:12px}
@@ -417,7 +429,7 @@ const dias = d => Math.round((new Date(d + 'T00:00') - new Date(hoy() + 'T00:00'
 const mesAnterior = m => { const [y, mm] = m.split('-').map(Number); const d = new Date(y, mm - 2, 1); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0'); };
 const mesSiguiente = m => { const [y, mm] = m.split('-').map(Number); const d = new Date(y, mm, 1); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0'); };
 
-let datos = [], vista = 'inicio', mes = hoy().slice(0, 7), secAbierta = '', subFiltro = 'Todos', idHoja = '';
+let datos = [], vista = 'inicio', mes = hoy().slice(0, 7), secAbierta = '', subFiltro = 'Todos', subEstado = '', idHoja = '';
 
 function say(t, tipo) { const m = $('msg'); m.textContent = t; m.className = 'msg' + (tipo ? ' ' + tipo : ''); m.classList.toggle('hidden', !t); if (t) setTimeout(() => m.classList.add('hidden'), 6000); }
 function guardarCache(d) { store.set(K.cache, JSON.stringify(d)); store.set(K.cacheT, String(Date.now())); }
@@ -493,13 +505,36 @@ function vSeccion() {
   let lista = delMes(mes, s.n);
   const prev = mesAnterior(mes);
   const total = suma(lista), totalPrev = suma(delMes(prev, s.n));
-  let extra = '';
+  let extra = '', vacio = '';
   if (s.n === 'Servicios básicos') {
     const usados = Object.keys(SERV).filter(x => lista.some(r => r.servicio === x));
     if (usados.length > 1) {
       if (!['Todos', ...usados].includes(subFiltro)) subFiltro = 'Todos';
       extra += `<div class="chips">${['Todos', ...usados].map(x => `<button data-sub="${esc(x)}" aria-pressed="${x === subFiltro}">${esc(x)}</button>`).join('')}</div>`;
       if (subFiltro !== 'Todos') lista = lista.filter(r => r.servicio === subFiltro);
+    }
+    if (subFiltro !== 'Todos' || usados.length === 1) {
+      const sv = subFiltro !== 'Todos' ? subFiltro : usados[0];
+      const anio = mes.slice(0, 4);
+      const todas = datos.filter(r => r.seccion === s.n && r.servicio === sv);
+      const delAnio = todas.filter(r => (r.mes || '').slice(0, 4) === anio);
+      const pag = delAnio.filter(r => r.pagado).sort((a, b) => b.pagado.localeCompare(a.pagado));
+      const por = todas.filter(r => !r.pagado).sort((a, b) => (a.vence || '9').localeCompare(b.vence || '9'));
+      const conC = todas.filter(r => r.consumo !== '' && r.consumo != null && !isNaN(Number(r.consumo))).sort((a, b) => (b.mes || '').localeCompare(a.mes || '') || (b.emision || '').localeCompare(a.emision || ''));
+      const ult = conC[0];
+      if (subEstado !== 'pag' && subEstado !== 'por') subEstado = por.length ? 'por' : 'pag';
+      const chips = (extra.match(/<div class="chips">[\s\S]*$/) || [''])[0];
+      extra = chips + `<div class="franja" style="--c:var(${s.c})">
+        <b>${esc(sv)}</b>
+        <div class="franja-fila"><span>Total del año ${esc(anio)}</span><strong>${money(suma(delAnio))}</strong></div>
+        <div class="franja-fila"><span>Último consumo${ult ? ' (' + esc(mesLargo(ult.mes)) + ')' : ''}</span><strong>${ult ? esc(Number(ult.consumo) + ' ' + (ult.unidad || SERV[sv] || '')) : '—'}</strong></div>
+      </div>
+      <div class="dos">
+        <button class="mini ok" data-sest="pag" aria-pressed="${subEstado === 'pag'}"><span>✓ Pagadas</span><b>${pag.length} · ${money(suma(pag))}</b><small>en ${esc(anio)}</small></button>
+        <button class="mini pend" data-sest="por" aria-pressed="${subEstado === 'por'}"><span>⏳ Por pagar</span><b>${por.length} · ${money(suma(por))}</b><small>${por.length ? 'vence ' + esc(fecha(por[0].vence)) : 'al día'}</small></button>
+      </div>`;
+      lista = subEstado === 'pag' ? pag : por;
+      vacio = subEstado === 'pag' ? `Aún no hay pagos de ${sv.toLowerCase()} en ${anio}.` : `No tiene facturas de ${sv.toLowerCase()} por pagar.`;
     }
     const comp = usados.map(x => {
       const v = suma(delMes(mes, s.n).filter(r => r.servicio === x));
@@ -508,7 +543,7 @@ function vSeccion() {
       const cAnt = ant.filter(r => r.consumo !== '' && r.consumo != null).reduce((a, r) => a + Number(r.consumo), 0);
       return `<div class="comp"><b>${esc(x)}</b><span>${money(v)}</span>${ant.length ? delta(v, suma(ant), money, prev) : ''}${c ? `<small>${c} ${SERV[x]}${cAnt ? ' · ' + delta(c, cAnt, n => n + ' ' + SERV[x], prev) : ''}</small>` : ''}</div>`;
     }).join('');
-    if (comp) extra = `<div class="comps">${comp}</div>` + extra;
+    if (comp && !vacio) extra = `<div class="comps">${comp}</div>` + extra;
   }
   return `
   <div class="cab-sec" style="--c:var(${s.c})">
@@ -517,7 +552,7 @@ function vSeccion() {
     <div><h2>${esc(s.n)}</h2><span class="cifra-s">${money(total)}</span> ${delta(total, delMes(prev, s.n).length ? totalPrev : null, money, prev)}</div>
   </div>
   ${extra}
-  <div class="lista">${lista.length ? lista.map(filaFactura).join('') : `<p class="nada">No hay facturas de ${esc(s.n.toLowerCase())} en ${esc(mesLargo(mes))}.</p>`}</div>`;
+  <div class="lista">${lista.length ? lista.map(filaFactura).join('') : `<p class="nada">${esc(vacio || 'No hay facturas de ' + s.n.toLowerCase() + ' en ' + mesLargo(mes) + '.')}</p>`}</div>`;
 }
 
 /* Pagos: por pagar y pagadas, por servicio */
@@ -582,8 +617,9 @@ $('mes-sig').addEventListener('click', () => { mes = mesSiguiente(mes); render()
 $('view').addEventListener('click', e => {
   const b = e.target.closest('button'); if (!b) return;
   if (b.dataset.ir) ir(b.dataset.ir);
-  else if (b.dataset.sec) { secAbierta = b.dataset.sec; subFiltro = 'Todos'; ir('seccion'); }
-  else if (b.dataset.sub) { subFiltro = b.dataset.sub; render(); }
+  else if (b.dataset.sec) { secAbierta = b.dataset.sec; subFiltro = 'Todos'; subEstado = ''; ir('seccion'); }
+  else if (b.dataset.sub) { subFiltro = b.dataset.sub; subEstado = ''; render(); }
+  else if (b.dataset.sest) { subEstado = b.dataset.sest; render(); }
   else if (b.dataset.ptab) { pagosTab = b.dataset.ptab; render(); }
   else if (b.dataset.pserv) { pagosServ = b.dataset.pserv; render(); }
   else if (b.dataset.id) abrirFactura(b.dataset.id);
