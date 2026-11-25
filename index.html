@@ -447,7 +447,7 @@ const dias = d => Math.round((new Date(d + 'T00:00') - new Date(hoy() + 'T00:00'
 const mesAnterior = m => { const [y, mm] = m.split('-').map(Number); const d = new Date(y, mm - 2, 1); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0'); };
 const mesSiguiente = m => { const [y, mm] = m.split('-').map(Number); const d = new Date(y, mm, 1); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0'); };
 
-const VERSION_APP = '25-nov-2026 · 9';
+const VERSION_APP = '25-nov-2026 · 10';
 let datos = [], vista = 'inicio', mes = hoy().slice(0, 7), secAbierta = '', subFiltro = 'Todos', subEstado = '', idHoja = '';
 
 function say(t, tipo) { const m = $('msg'); m.textContent = t; m.className = 'msg' + (tipo ? ' ' + tipo : ''); m.classList.toggle('hidden', !t); if (t) setTimeout(() => m.classList.add('hidden'), 6000); }
@@ -835,7 +835,12 @@ function arrancar() {
   mostrarBloqueo();
 }
 arrancar();
-if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
+if ('serviceWorker' in navigator) {
+  const habia = !!navigator.serviceWorker.controller;
+  navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' }).then(r => { r.update(); document.addEventListener('visibilitychange', () => { if (!document.hidden) r.update(); }); }).catch(() => {});
+  let recargada = false;
+  navigator.serviceWorker.addEventListener('controllerchange', () => { if (habia && !recargada) { recargada = true; location.reload(); } });
+}
 }
 </script>
 </body>
