@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#141414">
+<meta name="description" content="Economía del hogar LACAC: sus facturas y gastos del hogar, leídos de su correo y protegidos con su huella.">
+<title>Economía del hogar LACAC</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Marca LACAC: negro y rojo sobre crema, cinco barras que suben. */
+:root{--bg:#f4ecdc;--card:#fbf6ec;--ink:#141414;--mute:#6b6358;--line:#d9cdb8;--deep:#141414;--acc:#c8102e;--on-acc:#f4ecdc;--bad:#c8102e;--ok:#25693f;
+--agua:#2a6f9e;--luz:#9a6b00;--tel:#6b4f9e;--net:#1f7a6d;--basura:#25693f;--otro:#6b6358}
+@media(prefers-color-scheme:dark){:root{--bg:#141414;--card:#1f1d1a;--ink:#f4ecdc;--mute:#b5aa98;--line:#3a352f;--deep:#000;--acc:#ff5a5f;--on-acc:#141414;--bad:#ff5a5f;--ok:#63c08a;
+--agua:#6fb3e0;--luz:#e6b84a;--tel:#b39ddb;--net:#5cc2b2;--basura:#63c08a;--otro:#b5aa98}}
+*{box-sizing:border-box;min-width:0}
+html,body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 Inter,system-ui,sans-serif}
+body{padding-bottom:env(safe-area-inset-bottom)}
+h1,h2,.big{font-family:Archivo,Inter,sans-serif;line-height:1.05;margin:0}
+button{font:600 15px Inter,sans-serif;min-height:44px;padding:0 16px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer}
+button.acc{background:var(--acc);color:var(--on-acc);border-color:var(--acc)}
+button.pri{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+button.link{background:none;border:0;color:var(--mute);text-decoration:underline;min-height:40px}
+button:disabled{opacity:.55}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+input,select{font:16px Inter,sans-serif;min-height:46px;padding:8px 12px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink);width:100%}
+.hidden{display:none!important}
+.logo{width:34px;height:29px;flex:none}
+
+/* Pantallas de entrada (conectar, seguridad, bloqueo) */
+.puerta{min-height:100vh;min-height:100dvh;background:#141414;color:#f4ecdc;display:flex;flex-direction:column;justify-content:center;padding:calc(32px + env(safe-area-inset-top)) 24px 32px}
+.puerta .box{max-width:420px;width:100%;margin:0 auto;display:grid;gap:18px}
+.puerta .logo{width:84px;height:72px}
+.puerta h1{font-size:34px;font-weight:800}
+.puerta p{margin:0;color:#d9cdb8}
+.puerta input{background:#1f1d1a;border-color:#3a352f;color:#f4ecdc}
+.puerta button{background:transparent;color:#f4ecdc;border-color:#6b6358}
+.puerta button.acc{background:#c8102e;border-color:#c8102e;color:#f4ecdc}
+.puerta button.link{color:#d9cdb8;border:0}
+.puerta .err{color:#ff8a8d;min-height:1.5em}
+.puerta small{color:#b5aa98;font-size:13px}
+.pin{letter-spacing:.5em;text-align:center;font-size:26px;font-family:Archivo,Inter,sans-serif}
+.firma-p{color:#6b6358;font-size:13px;text-align:center;margin-top:28px}
+
+/* App */
+header{background:var(--deep);color:#f4ecdc;padding:calc(18px + env(safe-area-inset-top)) 16px 18px}
+.brand{display:flex;align-items:center;gap:12px}
+.brand h1{font-size:24px;font-weight:800;flex:1}
+.secciones{display:flex;gap:8px;overflow-x:auto;margin-top:14px;padding-bottom:4px}
+.secciones button{flex:none;min-height:36px;border-radius:99px;font-size:14px;background:transparent;color:#d9cdb8;border:1px solid #3a352f}
+.secciones button[aria-selected=true]{background:#f4ecdc;color:#141414;border-color:#f4ecdc}
+.secciones button small{opacity:.7;font-weight:500}
+.pronto{text-align:center;padding:40px 16px}
+.pronto h2{font-size:24px}
+.brand button{background:transparent;color:#f4ecdc;border-color:#6b6358;min-height:40px;padding:0 12px;font-size:14px}
+.tot{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-top:12px}
+.big{font-size:44px;font-weight:800;white-space:nowrap}
+.tot small{color:#d9cdb8}
+.acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+header .acts button{background:transparent;color:#f4ecdc;border-color:#6b6358}
+header .acts button.acc{background:#c8102e;border-color:#c8102e;color:#f4ecdc}
+nav{display:flex;position:sticky;top:0;z-index:5;background:var(--card);border-bottom:1px solid var(--line)}
+nav button{flex:1;border:0;border-radius:0;background:none;border-bottom:3px solid transparent;color:var(--mute)}
+nav button[aria-selected=true]{color:var(--ink);border-bottom-color:var(--acc)}
+main{padding:16px;max-width:900px;margin:0 auto}
+.chips{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px;margin-bottom:12px}
+.chips button{flex:none;min-height:38px;border-radius:99px;font-size:14px}
+.chips button[aria-pressed=true]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:10px}
+.it{display:grid;grid-template-columns:12px minmax(0,1fr) auto;gap:10px;align-items:start}
+.dot{width:12px;height:12px;border-radius:50%;margin-top:5px}
+.it b{font-size:17px}.mute{color:var(--mute);font-size:14px}
+.val{font-family:Archivo,Inter,sans-serif;font-size:20px;font-weight:700;text-align:right;white-space:nowrap}
+.tag{display:inline-block;font-size:13px;font-weight:600;padding:1px 8px;border-radius:99px;border:1px solid currentColor;white-space:nowrap}
+.ok{color:var(--ok)}.bad{color:var(--bad)}.wait{color:var(--mute)}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.row button{min-height:38px;font-size:14px}
+.svc{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px}
+.svc .card{margin:0;border-top:5px solid var(--c)}
+.delta{font-size:14px;margin-top:4px}
+.up{color:var(--bad)}.down{color:var(--ok)}
+.bars{display:grid;gap:8px}
+.bar{display:grid;grid-template-columns:64px minmax(0,1fr) 78px;gap:8px;align-items:center;font-size:14px}
+.track{display:flex;height:20px;border-radius:6px;overflow:hidden;background:var(--bg)}
+.num{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+h2{font-size:20px;margin:18px 0 10px}
+form{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px}
+label{display:grid;gap:4px;font-size:14px;color:var(--mute)}
+.full{grid-column:1/-1}
+.empty{text-align:center;color:var(--mute);padding:30px 10px}
+.msg{background:var(--card);border:2px solid var(--acc);padding:10px 14px;border-radius:10px;margin-bottom:12px}
+.aviso{background:var(--card);border:1px dashed var(--line);color:var(--mute);padding:8px 12px;border-radius:10px;margin-bottom:12px;font-size:14px}
+.firma{text-align:center;color:var(--mute);font-size:13px;padding:20px 16px 28px}
+dialog{border:0;border-radius:16px;padding:20px;max-width:420px;width:calc(100% - 32px);background:var(--card);color:var(--ink)}
+dialog::backdrop{background:rgba(0,0,0,.55)}
+dialog h2{margin-top:0}
+dialog .row{flex-direction:column}
+@media(max-width:420px){.svc,form{grid-template-columns:minmax(0,1fr)}.big{font-size:38px}}
+@media(prefers-reduced-motion:no-preference){.card{animation:entra .25s ease-out}@keyframes entra{from{opacity:0;transform:translateY(4px)}}}
+</style>
+</head>
+<body>
+
+<!-- 1. Conectar con el motor del usuario -->
+<section class="puerta hidden" id="p-conectar">
+  <div class="box">
+    <svg class="logo" viewBox="0 0 94 80" aria-hidden="true"><rect x="0" y="56" width="14" height="24" fill="#f4ecdc"/><rect x="20" y="44" width="14" height="36" fill="#f4ecdc"/><rect x="40" y="32" width="14" height="48" fill="#f4ecdc"/><rect x="60" y="20" width="14" height="60" fill="#f4ecdc"/><rect x="80" y="8" width="14" height="72" fill="#ff5a5f"/></svg>
+    <h1>Economía del hogar</h1>
+    <p>Conecte la app con su hoja de facturas. Pegue el <b>enlace de conexión</b> que le dio el programa al instalarlo (función «enlaceParaCelular»).</p>
+    <input id="c-enlace" placeholder="https://script.google.com/macros/s/…/exec?k=…" autocomplete="off" spellcheck="false">
+    <button class="acc" id="c-btn">Conectar</button>
+    <div class="err" id="c-err" role="alert"></div>
+    <small>Sus facturas se quedan en su propia cuenta de Google. Esta app solo las muestra en su celular.</small>
+  </div>
+</section>
+
+<!-- 2. Elegir cómo proteger la app -->
+<section class="puerta hidden" id="p-seguridad">
+  <div class="box">
+    <svg class="logo" viewBox="0 0 94 80" aria-hidden="true"><rect x="0" y="56" width="14" height="24" fill="#f4ecdc"/><rect x="20" y="44" width="14" height="36" fill="#f4ecdc"/><rect x="40" y="32" width="14" height="48" fill="#f4ecdc"/><rect x="60" y="20" width="14" height="60" fill="#f4ecdc"/><rect x="80" y="8" width="14" height="72" fill="#ff5a5f"/></svg>
+    <h1>Proteja su app</h1>
+    <p>Cada vez que la abra, le pedirá su huella (o rostro) para entrar.</p>
+    <button class="acc" id="s-huella">Usar mi huella</button>
+    <div id="s-pin-box" class="hidden" style="display:grid;gap:12px">
+      <p>Elija un PIN de 4 a 6 números:</p>
+      <input id="s-pin" class="pin" inputmode="numeric" type="password" maxlength="6" autocomplete="new-password">
+      <input id="s-pin2" class="pin" inputmode="numeric" type="password" maxlength="6" placeholder="Repita el PIN" autocomplete="new-password">
+      <button class="acc" id="s-pin-ok">Guardar PIN</button>
+    </div>
+    <button class="link" id="s-usar-pin">Prefiero usar un PIN</button>
+    <div class="err" id="s-err" role="alert"></div>
+  </div>
+</section>
+
+<!-- 3. Pantalla de bloqueo -->
+<section class="puerta hidden" id="p-bloqueo">
+  <div class="box" style="text-align:center;justify-items:center">
+    <svg class="logo" viewBox="0 0 94 80" aria-hidden="true"><rect x="0" y="56" width="14" height="24" fill="#f4ecdc"/><rect x="20" y="44" width="14" height="36" fill="#f4ecdc"/><rect x="40" y="32" width="14" height="48" fill="#f4ecdc"/><rect x="60" y="20" width="14" height="60" fill="#f4ecdc"/><rect x="80" y="8" width="14" height="72" fill="#ff5a5f"/></svg>
+    <h1>Economía del hogar</h1>
+    <button class="acc" id="b-huella" style="width:100%">Entrar con huella</button>
+    <div id="b-pin-box" class="hidden" style="display:grid;gap:12px;width:100%">
+      <input id="b-pin" class="pin" inputmode="numeric" type="password" maxlength="6" placeholder="PIN" autocomplete="current-password">
+      <button class="acc" id="b-pin-ok">Entrar</button>
+    </div>
+    <div class="err" id="b-err" role="alert"></div>
+    <p class="firma-p">Una app LACAC · Miguel Gerardo Morocho Loja</p>
+  </div>
+</section>
+
+<!-- 4. La app -->
+<div id="app" class="hidden">
+<header>
+  <div class="brand">
+    <svg class="logo" viewBox="0 0 94 80" aria-label="LACAC"><rect x="0" y="56" width="14" height="24" fill="#f4ecdc"/><rect x="20" y="44" width="14" height="36" fill="#f4ecdc"/><rect x="40" y="32" width="14" height="48" fill="#f4ecdc"/><rect x="60" y="20" width="14" height="60" fill="#f4ecdc"/><rect x="80" y="8" width="14" height="72" fill="#ff5a5f"/></svg>
+    <h1>Economía del hogar</h1>
+    <button id="ajustes" aria-label="Ajustes">Ajustes</button>
+  </div>
+  <div class="secciones" id="secciones" role="tablist" aria-label="Secciones"></div>
+  <div class="tot"><span class="big" id="pend">…</span><small id="pendTxt">Cargando sus facturas…</small></div>
+  <div class="acts"><button class="acc" id="buscar">Buscar facturas en el correo</button><button id="manual">Registrar a mano</button></div>
+</header>
+<nav role="tablist">
+  <button role="tab" data-v="recogidas" aria-selected="true">Recogidas</button>
+  <button role="tab" data-v="meses" aria-selected="false">Por meses</button>
+  <button role="tab" data-v="pendientes" aria-selected="false">Pendientes</button>
+</nav>
+<main>
+  <div class="aviso hidden" id="offline"></div>
+  <div class="msg hidden" id="msg" role="status"></div>
+  <div class="card hidden" id="formBox">
+    <h2 style="margin-top:0">Registrar a mano</h2>
+    <form id="form">
+      <label>Servicio<select id="f-servicio"></select></label>
+      <label>Empresa<input id="f-empresa" required></label>
+      <label>Mes del consumo<input id="f-mes" type="month" required></label>
+      <label>Valor ($)<input id="f-valor" type="number" step="0.01" min="0" inputmode="decimal" required></label>
+      <label>Consumo<input id="f-consumo" type="number" step="0.01" min="0" inputmode="decimal"></label>
+      <label>Unidad<input id="f-unidad"></label>
+      <label>Fecha límite<input id="f-vence" type="date"></label>
+      <label>Fecha de pago<input id="f-pagado" type="date"></label>
+      <div class="row full"><button class="pri" type="submit">Guardar</button><button type="button" id="cancel">Cancelar</button></div>
+    </form>
+  </div>
+  <div id="view"></div>
+</main>
+<footer class="firma">Una app LACAC · Miguel Gerardo Morocho Loja</footer>
+</div>
+
+<dialog id="d-ajustes">
+  <h2>Ajustes</h2>
+  <p class="mute" id="d-seg"></p>
+  <div class="row">
+    <button id="d-bloquear">Bloquear ahora</button>
+    <button id="d-cambiar-seg">Cambiar huella o PIN</button>
+    <button id="d-desconectar">Desconectar este celular</button>
+    <button class="pri" id="d-cerrar">Cerrar</button>
+  </div>
+</dialog>
+
+<script>
+{
+/* ───────── Datos guardados en este celular ───────── */
+const K = { con: 'lacac.eh.conexion', cred: 'lacac.eh.huella', pin: 'lacac.eh.pin', cache: 'lacac.eh.cache', cacheT: 'lacac.eh.cacheT' };
+const store = {
+  get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
+  set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} },
+  del(k) { try { localStorage.removeItem(k); } catch (e) {} }
+};
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const PANTALLAS = ['p-conectar', 'p-seguridad', 'p-bloqueo', 'app'];
+function ver(id) { PANTALLAS.forEach(p => $(p).classList.toggle('hidden', p !== id)); }
+const b64 = buf => btoa(String.fromCharCode(...new Uint8Array(buf)));
+const deB64 = s => Uint8Array.from(atob(s), c => c.charCodeAt(0));
+const azar = n => crypto.getRandomValues(new Uint8Array(n));
+async function hash(txt) { const d = await crypto.subtle.digest('SHA-256', new TextEncoder().encode('lacac:' + txt)); return b64(d); }
+
+/* ───────── 1. Conexión con el motor ───────── */
+function enlaceValido(u) { return /^https:\/\/script\.google\.com\/macros\/(u\/\d+\/)?s\/[\w-]+\/exec\?k=[a-f0-9]{32,}$/i.test(u.trim()); }
+
+async function api(a, extra) {
+  const u = new URL(store.get(K.con));
+  u.searchParams.set('a', a);
+  Object.entries(extra || {}).forEach(([k, v]) => u.searchParams.set(k, v));
+  const r = await fetch(u.toString(), { redirect: 'follow' });
+  const j = await r.json();
+  if (!j.ok) throw new Error(j.error === 'clave' ? 'La conexión ya no es válida: la clave cambió. Vuelva a conectar este celular.' : (j.error || 'Error del motor'));
+  return j;
+}
+
+async function conectar(enlace) {
+  $('c-err').textContent = '';
+  if (!enlaceValido(enlace)) { $('c-err').textContent = 'Ese enlace no es un enlace de conexión. Debe empezar con https://script.google.com y terminar con ?k= y la clave.'; return; }
+  $('c-btn').disabled = true; $('c-btn').textContent = 'Comprobando…';
+  store.set(K.con, enlace.trim());
+  try {
+    await api('hola');
+    history.replaceState(null, '', location.pathname);
+    ver('p-seguridad'); prepararSeguridad();
+  } catch (e) {
+    store.del(K.con);
+    $('c-err').textContent = /clave/.test(e.message) ? 'La clave no coincide. Genere el enlace de nuevo con «enlaceParaCelular».' :
+      'No se pudo conectar. Revise que la aplicación web esté implementada con acceso «Cualquier persona» y que tenga internet.';
+  } finally { $('c-btn').disabled = false; $('c-btn').textContent = 'Conectar'; }
+}
+$('c-btn').addEventListener('click', () => conectar($('c-enlace').value));
+
+/* ───────── 2. Huella (WebAuthn) o PIN ───────── */
+async function hayHuella() {
+  try { return !!(window.PublicKeyCredential && await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable()); } catch (e) { return false; }
+}
+async function prepararSeguridad() {
+  $('s-err').textContent = '';
+  const ok = await hayHuella();
+  $('s-huella').classList.toggle('hidden', !ok);
+  $('s-usar-pin').classList.toggle('hidden', !ok);
+  $('s-pin-box').classList.toggle('hidden', ok);
+  if (!ok) $('s-err').textContent = 'Este navegador no permite usar la huella aquí. Use un PIN.';
+}
+$('s-usar-pin').addEventListener('click', () => { $('s-pin-box').classList.remove('hidden'); $('s-huella').classList.add('hidden'); $('s-usar-pin').classList.add('hidden'); $('s-pin').focus(); });
+
+$('s-huella').addEventListener('click', async () => {
+  $('s-err').textContent = '';
+  try {
+    const cred = await navigator.credentials.create({ publicKey: {
+      challenge: azar(32),
+      rp: { name: 'LACAC · Economía del hogar' },
+      user: { id: azar(16), name: 'usuario-lacac', displayName: 'Usuario LACAC' },
+      pubKeyCredParams: [{ type: 'public-key', alg: -7 }, { type: 'public-key', alg: -257 }],
+      authenticatorSelection: { authenticatorAttachment: 'platform', userVerification: 'required', residentKey: 'discouraged' },
+      timeout: 60000, attestation: 'none'
+    }});
+    store.set(K.cred, b64(cred.rawId)); store.del(K.pin);
+    desbloqueado = true; entrar();
+  } catch (e) {
+    $('s-err').textContent = 'No se pudo registrar la huella. Inténtelo otra vez o use un PIN.';
+    $('s-usar-pin').classList.remove('hidden');
+  }
+});
+
+$('s-pin-ok').addEventListener('click', async () => {
+  const a = $('s-pin').value.trim(), b = $('s-pin2').value.trim();
+  if (!/^\d{4,6}$/.test(a)) { $('s-err').textContent = 'El PIN debe tener de 4 a 6 números.'; return; }
+  if (a !== b) { $('s-err').textContent = 'Los dos PIN no coinciden.'; return; }
+  store.set(K.pin, await hash(a)); store.del(K.cred);
+  desbloqueado = true; entrar();
+});
+
+/* ───────── 3. Bloqueo ───────── */
+let desbloqueado = false, ocultaDesde = 0;
+const BLOQUEO_MIN = 3;   // vuelve a pedir la huella tras 3 minutos fuera de la app
+
+function mostrarBloqueo() {
+  desbloqueado = false; $('b-err').textContent = ''; $('b-pin').value = '';
+  const conHuella = !!store.get(K.cred);
+  $('b-huella').classList.toggle('hidden', !conHuella);
+  $('b-pin-box').classList.toggle('hidden', conHuella);
+  ver('p-bloqueo');
+  if (conHuella) setTimeout(pedirHuella, 250); else setTimeout(() => $('b-pin').focus(), 100);
+}
+async function pedirHuella() {
+  $('b-err').textContent = '';
+  try {
+    await navigator.credentials.get({ publicKey: {
+      challenge: azar(32),
+      allowCredentials: [{ type: 'public-key', id: deB64(store.get(K.cred)) }],
+      userVerification: 'required', timeout: 60000
+    }});
+    desbloqueado = true; entrar();
+  } catch (e) { $('b-err').textContent = 'No se reconoció. Toque «Entrar con huella» para intentar de nuevo.'; }
+}
+$('b-huella').addEventListener('click', pedirHuella);
+async function probarPin() {
+  if (await hash($('b-pin').value.trim()) === store.get(K.pin)) { desbloqueado = true; entrar(); }
+  else { $('b-err').textContent = 'PIN incorrecto.'; $('b-pin').value = ''; }
+}
+$('b-pin-ok').addEventListener('click', probarPin);
+$('b-pin').addEventListener('keydown', e => { if (e.key === 'Enter') probarPin(); });
+
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) ocultaDesde = Date.now();
+  else if (desbloqueado && ocultaDesde && Date.now() - ocultaDesde > BLOQUEO_MIN * 60000) mostrarBloqueo();
+});
+
+/* ───────── 4. La app ───────── */
+const SV = { 'Agua potable': ['--agua', 'm³'], 'Luz eléctrica': ['--luz', 'kWh'], 'Teléfono': ['--tel', 'min'], 'Internet': ['--net', ''], 'Recolección de basura': ['--basura', ''], 'Otro': ['--otro', ''] };
+const MES = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
+const money = n => '$' + (Number(n) || 0).toLocaleString('es-EC', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const mesTxt = (m, largo) => { if (!m || !m.includes('-')) return esc(m); const [y, mm] = m.split('-'); return MES[+mm - 1] + ' ' + (largo ? y : y.slice(2)); };
+const fecha = d => d ? d.split('-').reverse().join('/') : '';
+const hoy = () => { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); };
+const dias = d => Math.round((new Date(d + 'T00:00') - new Date(hoy() + 'T00:00')) / 864e5);
+const color = s => `var(${(SV[s] || SV.Otro)[0]})`;
+let datos = [], vista = 'recogidas', filtro = 'Todos', mesSel = '';
+
+function say(t) { $('msg').textContent = t; $('msg').classList.toggle('hidden', !t); }
+function guardarCache(d) { store.set(K.cache, JSON.stringify(d)); store.set(K.cacheT, String(Date.now())); }
+function poner(d) { datos = d || []; guardarCache(datos); $('offline').classList.add('hidden'); render(); }
+function fallo(e) {
+  if (/clave/.test(e.message)) { say(e.message); return; }
+  const t = Number(store.get(K.cacheT));
+  $('offline').textContent = 'Sin conexión con su hoja. Mostrando los datos guardados' + (t ? ' del ' + new Date(t).toLocaleString('es-EC', { dateStyle: 'short', timeStyle: 'short' }) : '') + '.';
+  $('offline').classList.remove('hidden');
+}
+
+function estado(r) {
+  if (r.pagado) return `<span class="tag ok">Pagada ${esc(fecha(r.pagado))}</span>`;
+  if (!r.vence) return '<span class="tag wait">Pendiente</span>';
+  const d = dias(r.vence);
+  return d < 0 ? `<span class="tag bad">Vencida hace ${-d} d</span>` : `<span class="tag wait">Vence ${d === 0 ? 'hoy' : 'en ' + d + ' d'}</span>`;
+}
+function item(r) {
+  return `<div class="card"><div class="it"><span class="dot" style="background:${color(r.servicio)}"></span>
+    <div><b>${esc(r.servicio)}</b> · ${mesTxt(r.mes, true)}<div class="mute">${esc(r.empresa)}${r.consumo !== '' ? ' · ' + esc(r.consumo) + ' ' + esc(r.unidad) : ''}${r.factura ? ' · Fact. ' + esc(r.factura) : ''}</div>
+    <div style="margin-top:4px">${estado(r)} <span class="mute">${r.origen === 'Manual' ? '· a mano' : '· del correo'}</span></div></div>
+    <div class="val">${money(r.valor)}</div></div>
+    <div class="row">${r.pagado ? `<button data-unpay="${esc(r.id)}">Deshacer pago</button>` : `<button class="acc" data-pay="${esc(r.id)}">Pagada hoy</button>`}
+    ${r.origen === 'Manual' ? `<button data-del="${esc(r.id)}">Eliminar</button>` : ''}</div></div>`;
+}
+const ordenados = () => datos.slice().sort((a, b) => (b.mes || '').localeCompare(a.mes || '') || a.servicio.localeCompare(b.servicio));
+const usadosSV = () => Object.keys(SV).filter(s => datos.some(r => r.servicio === s));
+
+function vRecogidas() {
+  const usados = ['Todos', ...usadosSV()];
+  if (!usados.includes(filtro)) filtro = 'Todos';
+  const lista = ordenados().filter(r => filtro === 'Todos' || r.servicio === filtro);
+  return `<div class="chips">${usados.map(s => `<button data-f="${esc(s)}" aria-pressed="${s === filtro}">${esc(s)}</button>`).join('')}</div>` +
+    (lista.length ? lista.map(item).join('') : '<p class="empty">Aún no hay facturas. Pulse «Buscar facturas en el correo».</p>');
+}
+const sumaMes = (m, s) => datos.filter(r => r.mes === m && (!s || r.servicio === s)).reduce((a, r) => a + r.valor, 0);
+function consumoMes(m, s) { const r = datos.filter(x => x.mes === m && x.servicio === s && x.consumo !== ''); return r.length ? r.reduce((a, x) => a + Number(x.consumo), 0) : null; }
+function vMeses() {
+  const meses = [...new Set(datos.map(r => r.mes).filter(Boolean))].sort().reverse();
+  if (!meses.length) return '<p class="empty">Cuando haya facturas, aquí verá cada mes con su comparación.</p>';
+  if (!meses.includes(mesSel)) mesSel = meses[0];
+  const prev = meses[meses.indexOf(mesSel) + 1] || '';
+  const total = sumaMes(mesSel), tprev = prev ? sumaMes(prev) : null;
+  const delta = (a, b, fmt) => { if (b == null) return ''; const d = a - b; if (Math.abs(d) < 0.005) return `<div class="delta mute">Igual que ${mesTxt(prev)}</div>`;
+    return `<div class="delta ${d > 0 ? 'up' : 'down'}">${d > 0 ? '▲' : '▼'} ${fmt(Math.abs(d))} ${d > 0 ? 'más' : 'menos'} que ${mesTxt(prev)}</div>`; };
+  const servs = Object.keys(SV).filter(s => datos.some(r => r.mes === mesSel && r.servicio === s));
+  const ult = meses.slice(0, 12).reverse(), max = Math.max(1, ...ult.map(m => sumaMes(m)));
+  return `<div class="chips">${meses.map(m => `<button data-m="${esc(m)}" aria-pressed="${m === mesSel}">${mesTxt(m, true)}</button>`).join('')}</div>
+  <div class="card"><span class="mute">Total de ${mesTxt(mesSel, true)}</span><br><span class="big">${money(total)}</span>${delta(total, tprev, money)}</div>
+  <div class="svc">${servs.map(s => { const v = sumaMes(mesSel, s), c = consumoMes(mesSel, s), un = (datos.find(r => r.servicio === s && r.unidad) || {}).unidad || SV[s][1];
+    const pend = datos.some(r => r.mes === mesSel && r.servicio === s && !r.pagado);
+    const tienePrev = prev && datos.some(r => r.mes === prev && r.servicio === s);
+    return `<div class="card" style="--c:${color(s)}"><b>${esc(s)}</b><div class="val" style="text-align:left">${money(v)}</div>
+      ${c != null ? `<div class="mute">${esc(c)} ${esc(un)}</div>` : ''}${delta(v, tienePrev ? sumaMes(prev, s) : null, money)}
+      ${c != null && tienePrev && consumoMes(prev, s) != null ? delta(c, consumoMes(prev, s), n => n.toFixed(1) + ' ' + un) : ''}
+      <div style="margin-top:6px">${pend ? '<span class="tag wait">Por pagar</span>' : '<span class="tag ok">Pagado</span>'}</div></div>`; }).join('')}</div>
+  <h2>Últimos meses</h2>
+  <div class="card bars">${ult.map(m => `<div class="bar"><span>${mesTxt(m)}</span><div class="track">${Object.keys(SV).map(s => { const v = sumaMes(m, s); return v ? `<span style="width:${v / max * 100}%;background:${color(s)}"></span>` : ''; }).join('')}</div><span class="num">${money(sumaMes(m))}</span></div>`).join('')}</div>`;
+}
+function vPendientes() {
+  const p = datos.filter(r => !r.pagado).sort((a, b) => (a.vence || '9').localeCompare(b.vence || '9'));
+  return p.length ? p.map(item).join('') : '<p class="empty">Todo al día: no tiene facturas por pagar.</p>';
+}
+const SECCIONES = [
+  { id: 'servicios', nombre: 'Servicios básicos', lista: true },
+  { id: 'alimentacion', nombre: 'Alimentación' }, { id: 'salud', nombre: 'Salud' }, { id: 'educacion', nombre: 'Educación' },
+  { id: 'vivienda', nombre: 'Vivienda y hogar' }, { id: 'vestimenta', nombre: 'Vestimenta' }, { id: 'transporte', nombre: 'Transporte' }, { id: 'otros', nombre: 'Otros' }
+];
+let seccion = 'servicios';
+function pintarSecciones() {
+  $('secciones').innerHTML = SECCIONES.map(x => `<button role="tab" data-s="${x.id}" aria-selected="${x.id === seccion}">${esc(x.nombre)}${x.lista ? '' : ' <small>· pronto</small>'}</button>`).join('');
+}
+$('secciones').addEventListener('click', e => { const b = e.target.closest('button'); if (b) { seccion = b.dataset.s; render(); } });
+function vPronto() {
+  const x = SECCIONES.find(z => z.id === seccion);
+  return `<div class="card pronto"><h2>${esc(x.nombre)}</h2><p class="mute">Esta sección se activará en la próxima versión: leerá sus facturas de ${esc(x.nombre.toLowerCase())} del mismo correo, sin que tenga que hacer nada.</p></div>`;
+}
+
+function render() {
+  pintarSecciones();
+  const activa = SECCIONES.find(z => z.id === seccion).lista;
+  document.querySelector('nav').classList.toggle('hidden', !activa);
+  $('buscar').classList.toggle('hidden', !activa); $('manual').classList.toggle('hidden', !activa);
+  if (!activa) { $('view').innerHTML = vPronto(); return; }
+  const pend = datos.filter(r => !r.pagado);
+  $('pend').textContent = money(pend.reduce((a, r) => a + r.valor, 0));
+  $('pendTxt').textContent = pend.length ? `pendiente · ${pend.length} factura${pend.length > 1 ? 's' : ''} sin pagar` : 'pendiente · todo al día';
+  document.querySelectorAll('nav button').forEach(b => b.setAttribute('aria-selected', b.dataset.v === vista));
+  $('view').innerHTML = vista === 'meses' ? vMeses() : vista === 'pendientes' ? vPendientes() : vRecogidas();
+}
+
+document.querySelector('nav').addEventListener('click', e => { const b = e.target.closest('button'); if (b) { vista = b.dataset.v; render(); } });
+$('view').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  if (b.dataset.f) { filtro = b.dataset.f; render(); }
+  if (b.dataset.m) { mesSel = b.dataset.m; render(); }
+  if (b.dataset.pay) { b.disabled = true; api('pagar', { id: b.dataset.pay, fecha: hoy() }).then(j => poner(j.datos), e2 => { b.disabled = false; say('No se pudo guardar el pago: ' + e2.message); }); }
+  if (b.dataset.unpay) { b.disabled = true; api('pagar', { id: b.dataset.unpay, fecha: '' }).then(j => poner(j.datos), e2 => { b.disabled = false; say('No se pudo deshacer: ' + e2.message); }); }
+  if (b.dataset.del) { if (b.dataset.sure) { b.disabled = true; api('borrar', { id: b.dataset.del }).then(j => poner(j.datos), e2 => say(e2.message)); } else { b.dataset.sure = '1'; b.textContent = '¿Seguro?'; } }
+});
+$('buscar').addEventListener('click', () => {
+  const b = $('buscar'); b.disabled = true; b.textContent = 'Revisando el correo…'; say('');
+  api('buscar').then(j => { poner(j.datos); say(j.nuevas ? `Se recogieron ${j.nuevas} factura(s) nueva(s).` : 'No hay facturas nuevas en el correo.'); }, e => say('No se pudo revisar el correo: ' + e.message))
+    .finally(() => { b.disabled = false; b.textContent = 'Buscar facturas en el correo'; });
+});
+$('f-servicio').innerHTML = Object.keys(SV).map(s => `<option>${s}</option>`).join('');
+$('f-servicio').addEventListener('change', e => { $('f-unidad').value = SV[e.target.value][1]; });
+$('manual').addEventListener('click', () => { $('formBox').classList.remove('hidden'); $('f-mes').value = hoy().slice(0, 7); $('f-unidad').value = SV[$('f-servicio').value][1]; $('formBox').scrollIntoView({ behavior: 'smooth' }); });
+$('cancel').addEventListener('click', () => $('formBox').classList.add('hidden'));
+$('form').addEventListener('submit', e => {
+  e.preventDefault();
+  const o = {}; ['servicio', 'empresa', 'mes', 'valor', 'consumo', 'unidad', 'vence', 'pagado'].forEach(k => o[k] = $('f-' + k).value.trim());
+  api('manual', { o: JSON.stringify(o) }).then(j => { poner(j.datos); $('form').reset(); $('formBox').classList.add('hidden'); say('Registro guardado.'); }, e2 => say('No se pudo guardar: ' + e2.message));
+});
+
+/* Ajustes */
+$('ajustes').addEventListener('click', () => {
+  $('d-seg').textContent = store.get(K.cred) ? 'Protección: huella del celular.' : 'Protección: PIN.';
+  $('d-ajustes').showModal();
+});
+$('d-cerrar').addEventListener('click', () => $('d-ajustes').close());
+$('d-bloquear').addEventListener('click', () => { $('d-ajustes').close(); mostrarBloqueo(); });
+$('d-cambiar-seg').addEventListener('click', () => { $('d-ajustes').close(); ver('p-seguridad'); prepararSeguridad(); });
+$('d-desconectar').addEventListener('click', e => {
+  const b = e.currentTarget;
+  if (!b.dataset.sure) { b.dataset.sure = '1'; b.textContent = 'Toque otra vez para desconectar'; return; }
+  Object.values(K).forEach(store.del);
+  location.reload();
+});
+
+function entrar() {
+  ver('app');
+  const c = store.get(K.cache);
+  if (c) { try { datos = JSON.parse(c); render(); } catch (e) {} }
+  api('datos').then(j => poner(j.datos), fallo);
+}
+
+/* ───────── Arranque ───────── */
+function arrancar() {
+  const m = location.hash.match(/^#conectar=(.+)$/);
+  if (m) {
+    let enlace = ''; try { enlace = decodeURIComponent(m[1]); } catch (e) {}
+    ver('p-conectar'); $('c-enlace').value = enlace; conectar(enlace); return;
+  }
+  if (!store.get(K.con)) { ver('p-conectar'); return; }
+  if (!store.get(K.cred) && !store.get(K.pin)) { ver('p-seguridad'); prepararSeguridad(); return; }
+  mostrarBloqueo();
+}
+arrancar();
+if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
+}
+</script>
+</body>
+</html>

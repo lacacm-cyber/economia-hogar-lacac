@@ -1,0 +1,16 @@
+{
+  "name": "Economía del hogar LACAC",
+  "short_name": "Hogar LACAC",
+  "description": "Sus facturas y gastos del hogar, leídos de su correo y protegidos con su huella.",
+  "lang": "es",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#141414",
+  "theme_color": "#141414",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
